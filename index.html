@@ -91,22 +91,46 @@
           <div class="card-header compact">
             <span class="agenda-num">01</span>
             <div>
-              <h2>Databricks Value Architecture</h2>
-              <p class="card-sub">Drag to rotate. Click the scene to explode and re-stack the platform layers.</p>
+              <h2>The Databricks Data Intelligence Platform</h2>
+              <p class="card-sub">A plain-English view — from your cloud at the base, up through open storage and the intelligence engine, to the people, apps, and agents it serves. One governance layer (Unity Catalog) wraps it all.</p>
             </div>
           </div>
 
-          <div class="architecture-shell">
-            <div id="architecture-3d" class="architecture-canvas"></div>
-            <div class="scene-overlay">Interactive 3D overview for business leaders</div>
+          <div class="db-arch" role="img" aria-label="Databricks Data Intelligence Platform architecture, layered from cloud foundation up to the users and apps it serves, with Unity Catalog governance spanning every layer">
+            <div class="db-arch-gov">
+              <span class="db-arch-gov-label">Unity Catalog</span>
+              <span class="db-arch-gov-sub">One governance &amp; security layer across all data and AI — access, lineage, discovery</span>
+            </div>
+            <div class="db-arch-stack">
+              <div class="db-layer db-consume">
+                <div class="db-layer-title">Who it serves</div>
+                <div class="db-layer-desc">Business users · Analysts · Executives · Customer-facing apps &amp; agents</div>
+              </div>
+              <div class="db-layer db-work">
+                <div class="db-layer-title">What you do with it — Workloads</div>
+                <div class="db-work-grid">
+                  <div class="db-work-tile"><strong>Data Engineering</strong><span>Ingest &amp; prepare data — Lakeflow</span></div>
+                  <div class="db-work-tile"><strong>Warehousing &amp; BI</strong><span>SQL &amp; dashboards — Databricks SQL</span></div>
+                  <div class="db-work-tile"><strong>AI &amp; Machine Learning</strong><span>Models &amp; agents — Mosaic AI</span></div>
+                  <div class="db-work-tile"><strong>Genie &amp; Apps</strong><span>Ask-your-data &amp; custom apps</span></div>
+                </div>
+              </div>
+              <div class="db-layer db-engine">
+                <div class="db-layer-title">Data Intelligence Engine</div>
+                <div class="db-layer-desc">Serverless compute + Databricks IQ — the AI that understands your business data and its meaning</div>
+              </div>
+              <div class="db-layer db-storage">
+                <div class="db-layer-title">Open Lakehouse Storage</div>
+                <div class="db-layer-desc">Delta Lake &amp; open formats — all your data in one open place, no lock-in</div>
+              </div>
+              <div class="db-layer db-cloud">
+                <div class="db-layer-title">Your Cloud</div>
+                <div class="db-layer-desc">Runs in your own AWS, Azure &amp; Google Cloud account — your data stays with you</div>
+              </div>
+            </div>
           </div>
 
-          <div class="layer-legend">
-            <div class="legend-chip"><span class="legend-color unity"></span><strong>Governance</strong><small>Unity Catalog, security, lineage</small></div>
-            <div class="legend-chip"><span class="legend-color data"></span><strong>Data Engineering</strong><small>Lakeflow Jobs, Lakeflow Spark Declarative Pipelines</small></div>
-            <div class="legend-chip"><span class="legend-color analytics"></span><strong>Analytics</strong><small>SQL, dashboards, Genie experiences</small></div>
-            <div class="legend-chip"><span class="legend-color ai"></span><strong>AI &amp; Apps</strong><small>Agents, apps, model serving, MLflow</small></div>
-          </div>
+          <p class="arch-read-note">Read it bottom-up: your <strong>cloud</strong> holds <strong>open storage</strong>, the <strong>intelligence engine</strong> turns it into answers, <strong>workloads</strong> put it to work, and everyone from analysts to agents consumes it — with <strong>Unity Catalog</strong> governing every layer.</p>
 
           <div class="confidential-note">
             Roadmap details and future-state commentary are shared live during the session.
@@ -198,6 +222,122 @@
                 <li>Supervisor patterns unify data, documents, and actions behind one entry point</li>
                 <li>Observability makes AI experiences measurable and improvable</li>
               </ul>
+            </div>
+          </div>
+
+          <div class="arch-block">
+            <h3>What Genie Workbench scores — the IQ Scanner (12 checks)</h3>
+            <p class="card-sub" style="margin-bottom:1rem;">Each space gets a 0–12 score across three tiers: <strong>Not Ready</strong> → <strong>Ready to Optimize</strong> (checks 1–10) → <strong>Trusted</strong> (all 12). Baseline every space here <em>before</em> wiring it into a Supervisor.</p>
+            <div class="check-grid">
+              <div class="wb-feature"><strong>1 · Agent description</strong><span>Clear top-level description — also drives supervisor routing</span></div>
+              <div class="wb-feature"><strong>2 · Table descriptions</strong><span>≥80% of tables described (auto-enriched from Unity Catalog)</span></div>
+              <div class="wb-feature"><strong>3 · Column descriptions</strong><span>≥50% of columns described</span></div>
+              <div class="wb-feature"><strong>4 · Instructions</strong><span>Business-context text instructions present</span></div>
+              <div class="wb-feature"><strong>5 · Join specifications</strong><span>≥1 join defined when multiple tables are configured</span></div>
+              <div class="wb-feature"><strong>6 · Focused scope</strong><span>Between 1 and 12 tables / metric views — keeps the space tight</span></div>
+              <div class="wb-feature"><strong>7 · SQL guidance</strong><span>≥1 of: SQL functions, expressions, measures, filters, example SQL</span></div>
+              <div class="wb-feature"><strong>8 · Entity / format matching</strong><span>≥1 column with value/format assistance for accurate filters</span></div>
+              <div class="wb-feature"><strong>9 · Benchmark questions</strong><span>≥10 benchmark questions for measurable accuracy</span></div>
+              <div class="wb-feature"><strong>10 · Column noise control</strong><span>Noisy / internal columns hidden from the model</span></div>
+              <div class="wb-feature"><strong>11 · Optimization run</strong><span>A completed Auto-Optimize run exists</span></div>
+              <div class="wb-feature"><strong>12 · Accuracy ≥ 85%</strong><span>Best optimized benchmark accuracy clears the bar</span></div>
+            </div>
+          </div>
+
+          <div class="two-col">
+            <div class="info-block highlight">
+              <h3>Best practices these checks encode</h3>
+              <ul class="checklist">
+                <li>Prefer structured context (descriptions, synonyms, joins, example SQL) over long free-text prompts</li>
+                <li>Keep each space small and domain-focused — aim for 5 or fewer sources</li>
+                <li>Describe tables and columns in business language; hide noisy technical fields</li>
+                <li>Define joins explicitly — don't let Genie guess relationships</li>
+                <li>Build a benchmark of ≥10 (ideally ≥30) representative questions and measure accuracy</li>
+                <li>Set a strong agent description — it doubles as the Supervisor's routing signal</li>
+              </ul>
+            </div>
+            <div class="info-block">
+              <h3>How to apply it</h3>
+              <ul class="checklist">
+                <li>Scan each existing Genie space to get a baseline IQ score</li>
+                <li>Close the failing checks (descriptions, joins, benchmarks) to reach "Ready to Optimize"</li>
+                <li>Run Auto-Optimize to push benchmark accuracy past 85%</li>
+                <li>Only then add the space to a Supervisor — quality first, orchestration second</li>
+                <li>Re-scan after schema changes to catch drift</li>
+              </ul>
+              <p class="card-sub" style="margin-top:.5rem;">Genie Workbench is a Databricks "solutions" project — community-supported via GitHub, not official Databricks support.</p>
+            </div>
+          </div>
+
+          <div class="arch-block">
+            <h3>Directing the Supervisor Agent — routing that doesn't get lost</h3>
+            <p class="card-sub" style="margin-bottom:1rem;">A Supervisor routes each question to one child agent based on its description. Misrouting is almost always a description / instruction problem — not a model problem.</p>
+            <div class="two-col">
+              <div class="info-block">
+                <h3>Master prompt (supervisor instructions)</h3>
+                <ul class="checklist">
+                  <li>State the supervisor's role and explicit routing rules ("bookings &amp; revenue → Travel Analytics Genie; policy → Knowledge Assistant")</li>
+                  <li>Tell it to ask a clarifying question when a request is ambiguous or spans domains</li>
+                  <li>Define a fallback for out-of-scope questions so it degrades gracefully</li>
+                  <li>Keep it to global behavior — domain facts belong in the child agents, not here</li>
+                </ul>
+              </div>
+              <div class="info-block">
+                <h3>Tool &amp; agent descriptions</h3>
+                <ul class="checklist">
+                  <li>Make each description specific and non-overlapping — "Corporate-travel bookings: volume, revenue, TMC performance by region", not "travel data"</li>
+                  <li>Distinct boundaries stop two agents from both looking like the right target</li>
+                  <li>Every Genie space needs its own strong description (IQ check #1)</li>
+                  <li>The description <em>is</em> the routing signal — invest in it</li>
+                </ul>
+              </div>
+            </div>
+            <div class="two-col">
+              <div class="info-block">
+                <h3>Examples, tools &amp; skills</h3>
+                <ul class="checklist">
+                  <li>Add example questions paired with the expected agent — the highest-leverage fix for stubborn misrouting</li>
+                  <li>Reuse governed <strong>Unity Catalog functions</strong> and <strong>AI skills</strong> as tools for actions, not just Q&amp;A</li>
+                  <li>Attach external systems via MCP connections for write / operational tasks</li>
+                  <li>Test with real phrasings and sharpen descriptions where routing misses</li>
+                </ul>
+              </div>
+              <div class="info-block highlight">
+                <h3>Scale with hierarchy</h3>
+                <ul class="checklist">
+                  <li>Group related Genie spaces under domain sub-supervisors, then a top supervisor over those</li>
+                  <li>Smaller routing decisions at each level = less "lost context"</li>
+                  <li>Apply least-privilege so users only reach permitted sources</li>
+                  <li>A supervisor can't rescue a weak Genie space — get each to "Trusted" first</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <div class="arch-block">
+            <h3>Reusable, governed tools &amp; AI skills — Unity Gateway</h3>
+            <p class="card-sub" style="margin-bottom:1rem;">Register once, reuse everywhere. Unity Gateway extends Unity Catalog governance to runtime AI — models, MCP servers, tools/functions, and agents become governed, shareable building blocks a Supervisor can call.</p>
+            <div class="two-col">
+              <div class="info-block">
+                <h3>AI assets as Unity Catalog securables</h3>
+                <ul class="checklist">
+                  <li>Register models, MCP servers, UC functions/tools, and agents as governed objects</li>
+                  <li>Control access with standard Unity Catalog grants — least privilege by default</li>
+                  <li>Rate limits, guardrails, usage tracking, cost attribution, and audit logging</li>
+                  <li>Share a tool once — any authorized agent can reuse it</li>
+                </ul>
+                <a href="https://docs.databricks.com/aws/en/ai-gateway/" target="_blank" class="btn-link">Unity Gateway docs →</a>
+              </div>
+              <div class="info-block highlight">
+                <h3>How it strengthens the Supervisor</h3>
+                <ul class="checklist">
+                  <li>Add governed tools to the Supervisor as UC functions, MCP connections, Genie spaces, or agent endpoints</li>
+                  <li>The Supervisor inherits the caller's permissions — it can only invoke what the user may access</li>
+                  <li>Reusable skills mean less duplication and consistent governance across every agent</li>
+                  <li>Every tool call is auditable end to end</li>
+                </ul>
+                <a href="https://www.databricks.com/product/artificial-intelligence/unity-gateway" target="_blank" class="btn-link">Unity Gateway overview →</a>
+              </div>
             </div>
           </div>
 
@@ -376,25 +516,40 @@ AsyncDatabricksStore(
         </div>
 
         <div class="resource-grid">
+          <a href="https://docs.databricks.com/aws/en/genie/best-practices" target="_blank" class="resource-tile">
+            <span class="resource-icon">📘</span>
+            <strong>Genie Best Practices</strong>
+            <span class="resource-desc">Official docs — curate an effective agent</span>
+          </a>
+          <a href="https://docs.databricks.com/aws/en/generative-ai/agent-bricks/multi-agent-supervisor" target="_blank" class="resource-tile">
+            <span class="resource-icon">🤝</span>
+            <strong>Supervisor Agent</strong>
+            <span class="resource-desc">Official docs — multi-agent orchestration</span>
+          </a>
+          <a href="https://docs.databricks.com/aws/en/agents/custom-agents/stateful-agents" target="_blank" class="resource-tile">
+            <span class="resource-icon">🧠</span>
+            <strong>Agent Memory</strong>
+            <span class="resource-desc">Official docs — stateful agents</span>
+          </a>
           <a href="https://github.com/databricks-solutions/databricks-genie-workbench" target="_blank" class="resource-tile">
             <span class="resource-icon">📦</span>
             <strong>Genie Workbench</strong>
-            <span class="resource-desc">GitHub Repository</span>
+            <span class="resource-desc">GitHub — score &amp; optimize spaces</span>
           </a>
-          <a href="https://github.com/databricks-solutions/databricks-genie-workbench/blob/main/docs/docs/getting-started/architecture-overview.md" target="_blank" class="resource-tile">
-            <span class="resource-icon">🏗️</span>
-            <strong>Architecture Docs</strong>
-            <span class="resource-desc">Workbench internals</span>
+          <a href="https://github.com/databricks-solutions/genie-best-practices-agent" target="_blank" class="resource-tile">
+            <span class="resource-icon">✅</span>
+            <strong>Genie Best-Practices Agent</strong>
+            <span class="resource-desc">GitHub — CI/CD quality checks</span>
+          </a>
+          <a href="https://www.databricks.com/blog/agent-bricks-supervisor-agent-now-ga-orchestrate-enterprise-agents" target="_blank" class="resource-tile">
+            <span class="resource-icon">📣</span>
+            <strong>Supervisor Agent GA</strong>
+            <span class="resource-desc">Announcement blog</span>
           </a>
           <a href="https://developers.databricks.com/" target="_blank" class="resource-tile">
             <span class="resource-icon">🧑‍💻</span>
             <strong>Developer Portal</strong>
             <span class="resource-desc">developers.databricks.com</span>
-          </a>
-          <a href="#" class="resource-tile placeholder">
-            <span class="resource-icon">📓</span>
-            <strong>Hands-On Notebooks</strong>
-            <span class="resource-desc">Coming soon</span>
           </a>
           <a href="#" class="resource-tile placeholder">
             <span class="resource-icon">🎥</span>
@@ -442,8 +597,6 @@ AsyncDatabricksStore(
 
   </main>
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
   <script src="script.js"></script>
 </body>
 </html>

@@ -9,7 +9,6 @@ document.addEventListener('DOMContentLoaded', () => {
   initTerminalSimulation();
   initQuiz();
   initScrollAnimations();
-  initArchitectureScene();
   initResourceTiles();
   initGalleryHints();
 });
