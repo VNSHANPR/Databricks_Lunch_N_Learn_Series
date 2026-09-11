@@ -83,6 +83,7 @@
         <div class="agenda-tabs" role="tablist" aria-label="Agenda tabs">
           <button class="agenda-tab active" data-tab="tab-roadmap" role="tab" aria-selected="true">Roadmap</button>
           <button class="agenda-tab" data-tab="tab-genie" role="tab" aria-selected="false">Genie Agents &amp; Supervisor Best Practices</button>
+          <button class="agenda-tab" data-tab="tab-memory" role="tab" aria-selected="false">Agent Memory</button>
           <button class="agenda-tab" data-tab="tab-quiz" role="tab" aria-selected="false">Quiz</button>
         </div>
 
@@ -229,9 +230,101 @@
           </div>
         </section>
 
-        <section id="tab-quiz" class="tab-panel" role="tabpanel">
+        <section id="tab-memory" class="tab-panel" role="tabpanel">
           <div class="card-header compact">
             <span class="agenda-num">03</span>
+            <div>
+              <h2>Agent Memory</h2>
+              <p class="card-sub">Give your agents persistence — short-term session state and long-term semantic recall, powered by Lakebase.</p>
+            </div>
+          </div>
+
+          <div class="two-col">
+            <div class="info-block highlight">
+              <h3>Managed Memory</h3>
+              <p>Databricks handles storage, indexing, and lifecycle automatically. Ideal for production agents where you want zero infrastructure overhead.</p>
+              <ul class="checklist">
+                <li>Built-in checkpoint store for resumable conversation threads</li>
+                <li>Semantic memory with pgvector-backed embeddings via Databricks endpoints</li>
+                <li>Automatic TTL, compaction, and garbage collection</li>
+                <li>No infrastructure to provision — just configure project, branch, and schema</li>
+              </ul>
+              <a href="https://docs.databricks.com/aws/en/agents/custom-agents/stateful-agents#managed-memory" target="_blank" class="btn-link">Managed Memory Docs →</a>
+            </div>
+
+            <div class="info-block">
+              <h3>Self-Managed Memory</h3>
+              <p>Bring your own storage backend when you need full control over the persistence layer, custom retention policies, or hybrid architectures.</p>
+              <ul class="checklist">
+                <li>Plug in any checkpoint or store backend (Redis, Postgres, custom)</li>
+                <li>Full control over schema, indexing, and eviction strategies</li>
+                <li>Suitable for multi-cloud or air-gapped deployments</li>
+                <li>Use alongside managed memory for hybrid patterns</li>
+              </ul>
+              <a href="https://docs.databricks.com/aws/en/agents/custom-agents/stateful-agents#self-managed-memory" target="_blank" class="btn-link">Self-Managed Memory Docs →</a>
+            </div>
+          </div>
+
+          <div class="memory-terminal-section">
+            <h3>Initializing Agent Memory with LangGraph</h3>
+            <p class="card-sub">The <code>databricks_langchain</code> package provides async-ready checkpoint and store classes that wire directly into LangGraph’s persistence layer.</p>
+
+            <div class="terminal-card code-terminal">
+              <div class="terminal-header">
+                <span class="terminal-dot red"></span>
+                <span class="terminal-dot amber"></span>
+                <span class="terminal-dot green"></span>
+                <span class="terminal-title">agent_memory.py</span>
+              </div>
+              <div class="terminal-body code-body">
+<pre class="code-block"><span class="kw">from</span> <span class="mod">databricks_langchain</span> <span class="kw">import</span> AsyncCheckpointSaver, AsyncDatabricksStore
+
+<span class="comment"># Short-term: thread/session checkpoints — resumable runs.</span>
+<span class="kw">async with</span> AsyncCheckpointSaver(
+    project=<span class="str">PROJECT</span>,
+    branch=<span class="str">BRANCH</span>,
+    schema=<span class="str">SCHEMA</span>,
+) <span class="kw">as</span> checkpointer,
+AsyncDatabricksStore(
+    <span class="comment"># Long-term + semantic: pgvector-backed memory,</span>
+    <span class="comment"># embedded via a Databricks endpoint.</span>
+    project=<span class="str">PROJECT</span>,
+    branch=<span class="str">BRANCH</span>,
+    schema=<span class="str">SCHEMA</span>,
+    embedding_endpoint=<span class="str">"databricks-gte-large-en"</span>,
+    embedding_dims=<span class="str">1024</span>,
+) <span class="kw">as</span> store:
+    <span class="kw">yield</span> checkpointer, store</pre>
+              </div>
+            </div>
+          </div>
+
+          <div class="two-col" style="margin-top:1.25rem;">
+            <div class="info-block">
+              <h3>Key Concepts</h3>
+              <ul class="checklist">
+                <li><strong>AsyncCheckpointSaver</strong> — persists LangGraph thread state so conversations survive restarts</li>
+                <li><strong>AsyncDatabricksStore</strong> — semantic key-value store backed by pgvector for long-term recall</li>
+                <li><strong>Embedding endpoint</strong> — uses Databricks model serving (e.g. <code>databricks-gte-large-en</code>) for vector similarity</li>
+                <li><strong>Project / Branch / Schema</strong> — Lakebase coordinates that isolate memory per environment</li>
+              </ul>
+            </div>
+
+            <div class="info-block">
+              <h3>When to Use Each</h3>
+              <ul class="checklist">
+                <li><strong>Checkpoints only</strong> — stateful multi-turn chat, tool-calling agents with resumable sessions</li>
+                <li><strong>Store only</strong> — user preferences, learned facts, cross-session context</li>
+                <li><strong>Both together</strong> — production agents that remember the current thread <em>and</em> recall past interactions</li>
+              </ul>
+              <a href="https://docs.databricks.com/aws/en/agents/custom-agents/stateful-agents" target="_blank" class="btn-link">Full Stateful Agents Guide →</a>
+            </div>
+          </div>
+        </section>
+
+        <section id="tab-quiz" class="tab-panel" role="tabpanel">
+          <div class="card-header compact">
+            <span class="agenda-num">04</span>
             <div>
               <h2>Sample Quiz</h2>
               <p class="card-sub">Built-in questions to reinforce Genie and platform best practices.</p>

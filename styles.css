@@ -922,6 +922,67 @@ body::before {
   font-size: .82rem;
 }
 
+/* ========================  CODE TERMINAL  ======================== */
+.memory-terminal-section {
+  margin-top: 1.5rem;
+}
+
+.memory-terminal-section h3 {
+  font-size: 1.05rem;
+  font-weight: 700;
+  margin-bottom: .35rem;
+}
+
+.memory-terminal-section > .card-sub {
+  margin-bottom: 1rem;
+}
+
+.memory-terminal-section code {
+  font-family: var(--font-mono);
+  background: rgba(255,255,255,.06);
+  padding: .15rem .4rem;
+  border-radius: 4px;
+  font-size: .82rem;
+}
+
+.code-terminal {
+  margin-top: .75rem;
+}
+
+.code-body {
+  min-height: auto;
+  padding: 1.25rem 1rem;
+  overflow-x: auto;
+}
+
+.code-block {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: .82rem;
+  line-height: 1.7;
+  color: #B6C2CF;
+  white-space: pre;
+  tab-size: 4;
+}
+
+.code-block .kw {
+  color: #C792EA;
+  font-weight: 600;
+}
+
+.code-block .mod {
+  color: #82AAFF;
+}
+
+.code-block .str {
+  color: #C3E88D;
+}
+
+.code-block .comment {
+  color: #546E7A;
+  font-style: italic;
+}
+
 @media (max-width: 1100px) {
   .layer-legend,
   .resource-grid,
