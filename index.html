@@ -70,7 +70,7 @@
             <span class="terminal-dot red"></span>
             <span class="terminal-dot amber"></span>
             <span class="terminal-dot green"></span>
-            <span class="terminal-title">databricks bundle deploy</span>
+            <span class="terminal-title">databricks bundle generate</span>
           </div>
           <div id="cli-terminal" class="terminal-body">
             <div class="terminal-line"><span class="prompt">$</span> <span id="terminal-command"></span><span class="cursor"></span></div>
@@ -140,6 +140,31 @@
                 <li>Apply least-privilege access so users only reach permitted sources</li>
                 <li>Keep examples current and representative of executive workflows</li>
               </ul>
+            </div>
+          </div>
+
+          <div class="two-col">
+            <div class="info-block">
+              <h3>Genie Ontology</h3>
+              <p>The ontology layer gives Genie the business context it needs to write accurate SQL without guessing.</p>
+              <div class="workbench-features">
+                <div class="wb-feature">
+                  <strong>Knowledge Snippets</strong>
+                  <span>Curated definitions, metric formulas, and domain rules stored alongside your data</span>
+                </div>
+                <div class="wb-feature">
+                  <strong>Semantic Definitions</strong>
+                  <span>Column descriptions, join keys, and filter conventions that guide query generation</span>
+                </div>
+                <div class="wb-feature">
+                  <strong>Business Glossary</strong>
+                  <span>Standardized terms (e.g. "active customer", "churn") so Genie and analysts share one language</span>
+                </div>
+                <div class="wb-feature">
+                  <strong>Governed Tags &amp; Comments</strong>
+                  <span>Unity Catalog tags and column comments that propagate context to every downstream consumer</span>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -324,8 +349,8 @@
 
   </main>
 
-  <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/examples/js/controls/OrbitControls.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
   <script src="script.js"></script>
 </body>
 </html>

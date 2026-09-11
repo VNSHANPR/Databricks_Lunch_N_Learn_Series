@@ -77,13 +77,15 @@ function initTerminalSimulation() {
   const outputEl = document.getElementById('terminal-output');
   if (!commandEl || !outputEl) return;
 
-  const command = 'databricks bundle deploy --target prod';
+  const command = 'databricks bundle generate --existing-space-id abc123';
   const outputLines = [
-    'Validating bundle configuration...',
-    'Uploading resources to workspace...',
-    'Updating jobs, pipelines, and permissions...',
-    'Running deployment checks...',
-    'Deployment completed successfully.'
+    'Connecting to Databricks workspace...',
+    'Fetching Genie space configuration...',
+    'Discovering linked tables and permissions...',
+    'Generating databricks.yml with resource definitions...',
+    'Writing ./databricks.yml  ...done',
+    'Writing ./resources/genie_space.yml  ...done',
+    'Bundle scaffold created. Run "databricks bundle deploy" to publish.'
   ];
 
   let index = 0;
