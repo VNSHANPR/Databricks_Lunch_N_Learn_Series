@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FCTG × Databricks — Lunch &amp; Learn Series</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300..700;1,9..40,300..700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="icon" href="https://www.databricks.com/sites/default/files/2022-06/db-nav-logo.png" type="image/png">
+</head>
+<body>
+
+  <!-- ═══════════════════  SIDEBAR  ═══════════════════ -->
+  <nav id="sidebar">
+    <div class="sidebar-header">
+      <div class="logo">
+        <svg width="32" height="32" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M18 0L35.3205 9V27L18 36L0.679491 27V9L18 0Z" fill="#FF3621"/>
+          <path d="M18 6.75L28.4904 12.375V23.625L18 29.25L7.50962 23.625V12.375L18 6.75Z" fill="white" fill-opacity="0.4"/>
+          <path d="M18 13.5L21.8301 15.75V20.25L18 22.5L14.1699 20.25V15.75L18 13.5Z" fill="white"/>
+        </svg>
+        <span class="logo-text">Lunch &amp; Learn</span>
+      </div>
+      <p class="sidebar-subtitle">FCTG × Databricks</p>
+    </div>
+
+    <div class="sidebar-section-title">Sessions</div>
+    <ul class="session-list">
+      <li class="session-item active" data-session="session-20260917">
+        <span class="session-date">17 Sep 2026</span>
+        <span class="session-title">Databricks Roadmap &amp; Genie Best Practices</span>
+        <span class="session-badge new">Latest</span>
+      </li>
+      <li class="session-item" data-session="session-placeholder">
+        <span class="session-date">Coming Soon</span>
+        <span class="session-title">Future Sessions</span>
+      </li>
+    </ul>
+
+    <div class="sidebar-footer">
+      <a href="https://www.databricks.com" target="_blank" class="footer-link">databricks.com</a>
+      <a href="https://github.com/databricks-solutions" target="_blank" class="footer-link">GitHub</a>
+    </div>
+  </nav>
+
+  <!-- ═══════════════════  MOBILE HEADER  ═══════════════════ -->
+  <header id="mobile-header">
+    <button id="menu-toggle" aria-label="Toggle menu">
+      <span></span><span></span><span></span>
+    </button>
+    <span class="mobile-title">FCTG × Databricks</span>
+  </header>
+
+  <!-- ═══════════════════  MAIN CONTENT  ═══════════════════ -->
+  <main id="content">
+
+    <!-- ── SESSION: 17 Sep 2026 ── -->
+    <section id="session-20260917" class="session-page active">
+
+      <!-- Hero -->
+      <div class="hero">
+        <div class="hero-badge">Session 1 — 17 September 2026</div>
+        <h1>Databricks Roadmap &amp;<br>Genie Best Practices</h1>
+        <p class="hero-sub">An interactive deep-dive into the Databricks platform layers, the product roadmap, and operational excellence with Genie Spaces.</p>
+      </div>
+
+      <!-- ─── Agenda 1: Roadmap 3D Viz ─── -->
+      <div class="content-card">
+        <div class="card-header">
+          <span class="agenda-num">01</span>
+          <div>
+            <h2>Databricks Platform Roadmap</h2>
+            <p class="card-sub">Click the stack to explore the roadmap for each layer</p>
+          </div>
+        </div>
+
+        <div class="viz-container">
+          <div id="stack-3d" class="stack-scene">
+            <div class="stack-layer" data-layer="ai" style="--i:4; --color:#FF3621;">
+              <div class="layer-face front"><span class="layer-icon">🤖</span><span>AI &amp; ML</span></div>
+              <div class="layer-face top"></div>
+              <div class="layer-face right"></div>
+            </div>
+            <div class="stack-layer" data-layer="pipelines" style="--i:3; --color:#FF6F42;">
+              <div class="layer-face front"><span class="layer-icon">⚡</span><span>Pipelines</span></div>
+              <div class="layer-face top"></div>
+              <div class="layer-face right"></div>
+            </div>
+            <div class="stack-layer" data-layer="jobs" style="--i:2; --color:#1B3139;">
+              <div class="layer-face front"><span class="layer-icon">📋</span><span>Jobs &amp; Orchestration</span></div>
+              <div class="layer-face top"></div>
+              <div class="layer-face right"></div>
+            </div>
+            <div class="stack-layer" data-layer="unity" style="--i:1; --color:#00A972;">
+              <div class="layer-face front"><span class="layer-icon">🔒</span><span>Unity Catalog</span></div>
+              <div class="layer-face top"></div>
+              <div class="layer-face right"></div>
+            </div>
+          </div>
+          <button id="toggle-stack" class="btn-glow">Explore Roadmap →</button>
+        </div>
+
+        <!-- Roadmap cards (revealed on unstack) -->
+        <div id="roadmap-grid" class="roadmap-grid hidden">
+          <div class="roadmap-card" data-roadmap="de">
+            <div class="roadmap-icon" style="background:#1B3139;">🔧</div>
+            <h3>Data Engineering</h3>
+            <p>Lakeflow Spark Declarative Pipelines, Auto Loader enhancements, Liquid Clustering, and serverless compute advances.</p>
+            <ul class="roadmap-items">
+              <li>Serverless Jobs & Pipelines GA</li>
+              <li>Liquid Clustering improvements</li>
+              <li>Enhanced Auto Loader sources</li>
+              <li>Declarative Automation Bundles</li>
+            </ul>
+          </div>
+          <div class="roadmap-card" data-roadmap="genie">
+            <div class="roadmap-icon" style="background:#FF3621;">💬</div>
+            <h3>Genie &amp; AI/BI</h3>
+            <p>Natural-language data interaction, Genie Spaces improvements, AI/BI dashboards, and conversational analytics.</p>
+            <ul class="roadmap-items">
+              <li>Genie Spaces V2 with tool-calling</li>
+              <li>AI/BI Dashboard authoring</li>
+              <li>Genie Code enhancements</li>
+              <li>Compound AI Agents</li>
+            </ul>
+          </div>
+          <div class="roadmap-card" data-roadmap="apps">
+            <div class="roadmap-icon" style="background:#FF6F42;">📱</div>
+            <h3>AI Apps</h3>
+            <p>Databricks Apps platform, Agent Bricks, full-stack AI application deployment on Lakehouse.</p>
+            <ul class="roadmap-items">
+              <li>Databricks Apps GA</li>
+              <li>Agent Bricks (Supervisor, Knowledge)</li>
+              <li>Model Serving enhancements</li>
+              <li>Vector Search improvements</li>
+            </ul>
+          </div>
+          <div class="roadmap-card" data-roadmap="mlops">
+            <div class="roadmap-icon" style="background:#00A972;">🔬</div>
+            <h3>MLOps</h3>
+            <p>MLflow integration, model lifecycle, experiment tracking, and production model governance.</p>
+            <ul class="roadmap-items">
+              <li>MLflow Tracing GA</li>
+              <li>Unity Catalog model governance</li>
+              <li>Feature Engineering V2</li>
+              <li>Lakehouse Monitoring</li>
+            </ul>
+          </div>
+        </div>
+        <button id="collapse-stack" class="btn-outline hidden">← Back to Stack View</button>
+      </div>
+
+      <!-- ─── Agenda 2: Genie Best Practices ─── -->
+      <div class="content-card">
+        <div class="card-header">
+          <span class="agenda-num">02</span>
+          <div>
+            <h2>Databricks Genie Best Practices</h2>
+            <p class="card-sub">CI/CD, the Genie Workbench, and operational excellence for Genie Spaces</p>
+          </div>
+        </div>
+
+        <div class="two-col">
+          <!-- CI/CD -->
+          <div class="info-block">
+            <h3>🔄 CI/CD for Genie Spaces</h3>
+            <p>Automate quality gates for your AI-powered data agents. Version-control Space configurations, benchmark question sets, and deploy with confidence.</p>
+            <ul class="checklist">
+              <li>Version-control Space definitions in Git</li>
+              <li>Automated benchmark testing on PRs</li>
+              <li>Promotion pipelines: Dev → Staging → Prod</li>
+              <li>Regression detection before deployment</li>
+            </ul>
+          </div>
+
+          <!-- Genie Workbench -->
+          <div class="info-block highlight">
+            <h3>🛠️ Genie Workbench</h3>
+            <p>A full-stack diagnostic &amp; optimization tool deployed as a Databricks App. Scans your Genie Spaces, detects problems, and advises resolutions.</p>
+            <div class="workbench-features">
+              <div class="wb-feature">
+                <strong>IQ Scanner</strong>
+                <span>12-check rule-based scoring across 3 maturity tiers</span>
+              </div>
+              <div class="wb-feature">
+                <strong>Auto-Optimize (GSO)</strong>
+                <span>Automated benchmark QC, native patch/eval loop &amp; publish</span>
+              </div>
+              <div class="wb-feature">
+                <strong>GenieWatch</strong>
+                <span>Observability: cost, usage trends, feedback, resource lineage</span>
+              </div>
+              <div class="wb-feature">
+                <strong>Create Agent</strong>
+                <span>Multi-turn tool-calling LLM wizard for building new Agents</span>
+              </div>
+            </div>
+            <a href="https://github.com/databricks-solutions/databricks-genie-workbench" target="_blank" class="btn-link">View on GitHub →</a>
+          </div>
+        </div>
+
+        <!-- Architecture diagram (text-based) -->
+        <div class="arch-block">
+          <h3>Workbench Architecture</h3>
+          <div class="arch-diagram">
+            <div class="arch-row">
+              <div class="arch-box proxy">Reverse Proxy (OBO)</div>
+            </div>
+            <div class="arch-arrow">↓</div>
+            <div class="arch-row">
+              <div class="arch-box backend">FastAPI Backend
+                <div class="arch-sub">Routers: analysis · spaces · admin · create · auto_optimize</div>
+                <div class="arch-sub">Services: auth · genie · llm · lakebase · scanner</div>
+              </div>
+            </div>
+            <div class="arch-arrow">↓</div>
+            <div class="arch-row multi">
+              <div class="arch-box ext">Genie API</div>
+              <div class="arch-box ext">Unity Catalog</div>
+              <div class="arch-box ext">SQL Warehouse</div>
+              <div class="arch-box ext">Model Serving</div>
+            </div>
+            <div class="arch-row multi">
+              <div class="arch-box ext">Lakebase</div>
+              <div class="arch-box ext">MLflow</div>
+              <div class="arch-box ext">Delta (GSO state)</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ─── Resources & Links ─── -->
+      <div class="content-card">
+        <div class="card-header">
+          <span class="agenda-num">📎</span>
+          <div>
+            <h2>Resources &amp; Hands-On</h2>
+            <p class="card-sub">Notebooks, repositories, and documentation</p>
+          </div>
+        </div>
+
+        <div class="resource-grid">
+          <a href="https://github.com/databricks-solutions/databricks-genie-workbench" target="_blank" class="resource-tile">
+            <span class="resource-icon">📦</span>
+            <strong>Genie Workbench</strong>
+            <span class="resource-desc">GitHub Repository</span>
+          </a>
+          <a href="https://github.com/databricks-solutions/databricks-genie-workbench/blob/main/docs/docs/getting-started/architecture-overview.md" target="_blank" class="resource-tile">
+            <span class="resource-icon">🏗️</span>
+            <strong>Architecture Docs</strong>
+            <span class="resource-desc">Workbench internals</span>
+          </a>
+          <a href="https://developers.databricks.com/" target="_blank" class="resource-tile">
+            <span class="resource-icon">🧑‍💻</span>
+            <strong>Developer Portal</strong>
+            <span class="resource-desc">developers.databricks.com</span>
+          </a>
+          <a href="#" class="resource-tile placeholder">
+            <span class="resource-icon">📓</span>
+            <strong>Hands-On Notebooks</strong>
+            <span class="resource-desc">Coming soon</span>
+          </a>
+          <a href="#" class="resource-tile placeholder">
+            <span class="resource-icon">🎥</span>
+            <strong>Demo Recordings</strong>
+            <span class="resource-desc">Coming soon</span>
+          </a>
+          <a href="#" class="resource-tile placeholder">
+            <span class="resource-icon">📸</span>
+            <strong>Screenshots &amp; GIFs</strong>
+            <span class="resource-desc">Coming soon</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- Media Gallery Placeholder -->
+      <div class="content-card">
+        <div class="card-header">
+          <span class="agenda-num">🖼️</span>
+          <div>
+            <h2>Media Gallery</h2>
+            <p class="card-sub">Screenshots and GIFs from the session demos</p>
+          </div>
+        </div>
+        <div class="gallery-placeholder">
+          <div class="gallery-slot"><span>+</span><p>Add screenshot</p></div>
+          <div class="gallery-slot"><span>+</span><p>Add GIF</p></div>
+          <div class="gallery-slot"><span>+</span><p>Add screenshot</p></div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ── Placeholder for future sessions ── -->
+    <section id="session-placeholder" class="session-page">
+      <div class="hero">
+        <div class="hero-badge">Coming Soon</div>
+        <h1>Future Sessions</h1>
+        <p class="hero-sub">Stay tuned for upcoming Lunch &amp; Learn topics. New sessions will appear here as they are scheduled.</p>
+      </div>
+      <div class="content-card" style="text-align:center; padding:4rem 2rem;">
+        <p style="font-size:3rem; margin-bottom:1rem;">🗓️</p>
+        <p style="color:var(--text-secondary); font-size:1.1rem;">Check back soon for the next session agenda and materials.</p>
+      </div>
+    </section>
+
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
