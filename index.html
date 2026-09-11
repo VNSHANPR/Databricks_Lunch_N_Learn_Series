@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>FCTG × Databricks — Lunch &amp; Learn Series</title>
+  <title>Databricks — Lunch &amp; Learn Series</title>
   <link rel="stylesheet" href="styles.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -23,7 +23,7 @@
         </svg>
         <span class="logo-text">Lunch &amp; Learn</span>
       </div>
-      <p class="sidebar-subtitle">FCTG × Databricks</p>
+      <p class="sidebar-subtitle">Databricks</p>
     </div>
 
     <div class="sidebar-section-title">Sessions</div>
@@ -50,7 +50,7 @@
     <button id="menu-toggle" aria-label="Toggle menu">
       <span></span><span></span><span></span>
     </button>
-    <span class="mobile-title">FCTG × Databricks</span>
+    <span class="mobile-title">Databricks Lunch &amp; Learn</span>
   </header>
 
   <!-- ═══════════════════  MAIN CONTENT  ═══════════════════ -->
@@ -59,176 +59,192 @@
     <!-- ── SESSION: 17 Sep 2026 ── -->
     <section id="session-20260917" class="session-page active">
 
-      <!-- Hero -->
-      <div class="hero">
-        <div class="hero-badge">Session 1 — 17 September 2026</div>
-        <h1>Databricks Roadmap &amp;<br>Genie Best Practices</h1>
-        <p class="hero-sub">An interactive deep-dive into the Databricks platform layers, the product roadmap, and operational excellence with Genie Spaces.</p>
+      <div class="hero hero-grid">
+        <div>
+          <div class="hero-badge">Session 1 — 17 September 2026</div>
+          <h1>Databricks Roadmap,<br>Genie Best Practices<br>&amp; Executive Demos</h1>
+          <p class="hero-sub">A generic Lunch &amp; Learn experience with interactive architecture visuals, Genie guidance, and live-ready session resources.</p>
+        </div>
+        <div class="terminal-card">
+          <div class="terminal-header">
+            <span class="terminal-dot red"></span>
+            <span class="terminal-dot amber"></span>
+            <span class="terminal-dot green"></span>
+            <span class="terminal-title">databricks bundle deploy</span>
+          </div>
+          <div id="cli-terminal" class="terminal-body">
+            <div class="terminal-line"><span class="prompt">$</span> <span id="terminal-command"></span><span class="cursor"></span></div>
+            <div id="terminal-output" class="terminal-output"></div>
+          </div>
+        </div>
       </div>
 
-      <!-- ─── Agenda 1: Roadmap 3D Viz ─── -->
-      <div class="content-card">
-        <div class="card-header">
-          <span class="agenda-num">01</span>
-          <div>
-            <h2>Databricks Platform Roadmap</h2>
-            <p class="card-sub">Click the stack to explore the roadmap for each layer</p>
-          </div>
+      <div class="content-card tabs-card">
+        <div class="agenda-tabs" role="tablist" aria-label="Agenda tabs">
+          <button class="agenda-tab active" data-tab="tab-roadmap" role="tab" aria-selected="true">Roadmap</button>
+          <button class="agenda-tab" data-tab="tab-genie" role="tab" aria-selected="false">Genie Agents &amp; Supervisor Best Practices</button>
+          <button class="agenda-tab" data-tab="tab-quiz" role="tab" aria-selected="false">Quiz</button>
         </div>
 
-        <div class="viz-container">
-          <div id="stack-3d" class="stack-scene">
-            <div class="stack-layer" data-layer="ai" style="--i:4; --color:#FF3621;">
-              <div class="layer-face front"><span class="layer-icon">🤖</span><span>AI &amp; ML</span></div>
-              <div class="layer-face top"></div>
-              <div class="layer-face right"></div>
-            </div>
-            <div class="stack-layer" data-layer="pipelines" style="--i:3; --color:#FF6F42;">
-              <div class="layer-face front"><span class="layer-icon">⚡</span><span>Pipelines</span></div>
-              <div class="layer-face top"></div>
-              <div class="layer-face right"></div>
-            </div>
-            <div class="stack-layer" data-layer="jobs" style="--i:2; --color:#1B3139;">
-              <div class="layer-face front"><span class="layer-icon">📋</span><span>Jobs &amp; Orchestration</span></div>
-              <div class="layer-face top"></div>
-              <div class="layer-face right"></div>
-            </div>
-            <div class="stack-layer" data-layer="unity" style="--i:1; --color:#00A972;">
-              <div class="layer-face front"><span class="layer-icon">🔒</span><span>Unity Catalog</span></div>
-              <div class="layer-face top"></div>
-              <div class="layer-face right"></div>
+        <section id="tab-roadmap" class="tab-panel active" role="tabpanel">
+          <div class="card-header compact">
+            <span class="agenda-num">01</span>
+            <div>
+              <h2>Databricks Value Architecture</h2>
+              <p class="card-sub">Drag to rotate. Click the scene to explode and re-stack the platform layers.</p>
             </div>
           </div>
-          <button id="toggle-stack" class="btn-glow">Explore Roadmap →</button>
-        </div>
 
-        <!-- Roadmap cards (revealed on unstack) -->
-        <div id="roadmap-grid" class="roadmap-grid hidden">
-          <div class="roadmap-card" data-roadmap="de">
-            <div class="roadmap-icon" style="background:#1B3139;">🔧</div>
-            <h3>Data Engineering</h3>
-            <p>Lakeflow Spark Declarative Pipelines, Auto Loader enhancements, Liquid Clustering, and serverless compute advances.</p>
-            <ul class="roadmap-items">
-              <li>Serverless Jobs & Pipelines GA</li>
-              <li>Liquid Clustering improvements</li>
-              <li>Enhanced Auto Loader sources</li>
-              <li>Declarative Automation Bundles</li>
-            </ul>
-          </div>
-          <div class="roadmap-card" data-roadmap="genie">
-            <div class="roadmap-icon" style="background:#FF3621;">💬</div>
-            <h3>Genie &amp; AI/BI</h3>
-            <p>Natural-language data interaction, Genie Spaces improvements, AI/BI dashboards, and conversational analytics.</p>
-            <ul class="roadmap-items">
-              <li>Genie Spaces V2 with tool-calling</li>
-              <li>AI/BI Dashboard authoring</li>
-              <li>Genie Code enhancements</li>
-              <li>Compound AI Agents</li>
-            </ul>
-          </div>
-          <div class="roadmap-card" data-roadmap="apps">
-            <div class="roadmap-icon" style="background:#FF6F42;">📱</div>
-            <h3>AI Apps</h3>
-            <p>Databricks Apps platform, Agent Bricks, full-stack AI application deployment on Lakehouse.</p>
-            <ul class="roadmap-items">
-              <li>Databricks Apps GA</li>
-              <li>Agent Bricks (Supervisor, Knowledge)</li>
-              <li>Model Serving enhancements</li>
-              <li>Vector Search improvements</li>
-            </ul>
-          </div>
-          <div class="roadmap-card" data-roadmap="mlops">
-            <div class="roadmap-icon" style="background:#00A972;">🔬</div>
-            <h3>MLOps</h3>
-            <p>MLflow integration, model lifecycle, experiment tracking, and production model governance.</p>
-            <ul class="roadmap-items">
-              <li>MLflow Tracing GA</li>
-              <li>Unity Catalog model governance</li>
-              <li>Feature Engineering V2</li>
-              <li>Lakehouse Monitoring</li>
-            </ul>
-          </div>
-        </div>
-        <button id="collapse-stack" class="btn-outline hidden">← Back to Stack View</button>
-      </div>
-
-      <!-- ─── Agenda 2: Genie Best Practices ─── -->
-      <div class="content-card">
-        <div class="card-header">
-          <span class="agenda-num">02</span>
-          <div>
-            <h2>Databricks Genie Best Practices</h2>
-            <p class="card-sub">CI/CD, the Genie Workbench, and operational excellence for Genie Spaces</p>
-          </div>
-        </div>
-
-        <div class="two-col">
-          <!-- CI/CD -->
-          <div class="info-block">
-            <h3>🔄 CI/CD for Genie Spaces</h3>
-            <p>Automate quality gates for your AI-powered data agents. Version-control Space configurations, benchmark question sets, and deploy with confidence.</p>
-            <ul class="checklist">
-              <li>Version-control Space definitions in Git</li>
-              <li>Automated benchmark testing on PRs</li>
-              <li>Promotion pipelines: Dev → Staging → Prod</li>
-              <li>Regression detection before deployment</li>
-            </ul>
+          <div class="architecture-shell">
+            <div id="architecture-3d" class="architecture-canvas"></div>
+            <div class="scene-overlay">Interactive 3D overview for business leaders</div>
           </div>
 
-          <!-- Genie Workbench -->
-          <div class="info-block highlight">
-            <h3>🛠️ Genie Workbench</h3>
-            <p>A full-stack diagnostic &amp; optimization tool deployed as a Databricks App. Scans your Genie Spaces, detects problems, and advises resolutions.</p>
-            <div class="workbench-features">
-              <div class="wb-feature">
-                <strong>IQ Scanner</strong>
-                <span>12-check rule-based scoring across 3 maturity tiers</span>
+          <div class="layer-legend">
+            <div class="legend-chip"><span class="legend-color unity"></span><strong>Governance</strong><small>Unity Catalog, security, lineage</small></div>
+            <div class="legend-chip"><span class="legend-color data"></span><strong>Data Engineering</strong><small>Lakeflow Jobs, Lakeflow Spark Declarative Pipelines</small></div>
+            <div class="legend-chip"><span class="legend-color analytics"></span><strong>Analytics</strong><small>SQL, dashboards, Genie experiences</small></div>
+            <div class="legend-chip"><span class="legend-color ai"></span><strong>AI &amp; Apps</strong><small>Agents, apps, model serving, MLflow</small></div>
+          </div>
+
+          <div class="confidential-note">
+            Roadmap details and future-state commentary are shared live during the session.
+          </div>
+        </section>
+
+        <section id="tab-genie" class="tab-panel" role="tabpanel">
+          <div class="card-header compact">
+            <span class="agenda-num">02</span>
+            <div>
+              <h2>Genie Agents &amp; Supervisor Best Practices</h2>
+              <p class="card-sub">Design, CI/CD, observability, and multi-agent operating patterns.</p>
+            </div>
+          </div>
+
+          <div class="two-col">
+            <div class="info-block">
+              <h3>Genie space delivery</h3>
+              <ul class="checklist">
+                <li>Use curated tables, clear metric definitions, and strong examples</li>
+                <li>Store prompts, instructions, and benchmark questions in Git</li>
+                <li>Run benchmark regressions before promoting environment changes</li>
+                <li>Use dev, test, and production promotion gates for safer rollout</li>
+              </ul>
+            </div>
+
+            <div class="info-block highlight">
+              <h3>Supervisor patterns</h3>
+              <ul class="checklist">
+                <li>Use Supervisor Agent for multi-domain questions across tools or subagents</li>
+                <li>Write precise tool and subagent descriptions for better routing</li>
+                <li>Apply least-privilege access so users only reach permitted sources</li>
+                <li>Keep examples current and representative of executive workflows</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="two-col">
+            <div class="info-block">
+              <h3>Genie Workbench</h3>
+              <p>A Databricks App for scanning Genie spaces, identifying issues, and guiding remediation using benchmarking, optimization, and observability workflows.</p>
+              <div class="workbench-features">
+                <div class="wb-feature">
+                  <strong>IQ Scanner</strong>
+                  <span>12 rule-based checks across maturity tiers</span>
+                </div>
+                <div class="wb-feature">
+                  <strong>Auto-Optimize</strong>
+                  <span>Benchmark quality control and iterative optimization loop</span>
+                </div>
+                <div class="wb-feature">
+                  <strong>GenieWatch</strong>
+                  <span>Usage, cost, feedback, and executed-resource observability</span>
+                </div>
               </div>
-              <div class="wb-feature">
-                <strong>Auto-Optimize (GSO)</strong>
-                <span>Automated benchmark QC, native patch/eval loop &amp; publish</span>
+              <a href="https://github.com/databricks-solutions/databricks-genie-workbench" target="_blank" class="btn-link">View on GitHub →</a>
+            </div>
+
+            <div class="info-block">
+              <h3>Executive talking points</h3>
+              <ul class="checklist">
+                <li>Governed self-service reduces time to insight</li>
+                <li>Benchmarking and CI/CD reduce trust erosion from regressions</li>
+                <li>Supervisor patterns unify data, documents, and actions behind one entry point</li>
+                <li>Observability makes AI experiences measurable and improvable</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="arch-block">
+            <h3>Workbench Architecture</h3>
+            <div class="arch-diagram">
+              <div class="arch-row">
+                <div class="arch-box proxy">Reverse Proxy (OBO)</div>
               </div>
-              <div class="wb-feature">
-                <strong>GenieWatch</strong>
-                <span>Observability: cost, usage trends, feedback, resource lineage</span>
+              <div class="arch-arrow">↓</div>
+              <div class="arch-row">
+                <div class="arch-box backend">FastAPI Backend
+                  <div class="arch-sub">Routers: analysis · spaces · admin · create · auto_optimize</div>
+                  <div class="arch-sub">Services: auth · genie · llm · lakebase · scanner</div>
+                </div>
               </div>
-              <div class="wb-feature">
-                <strong>Create Agent</strong>
-                <span>Multi-turn tool-calling LLM wizard for building new Agents</span>
+              <div class="arch-arrow">↓</div>
+              <div class="arch-row multi">
+                <div class="arch-box ext">Genie API</div>
+                <div class="arch-box ext">Unity Catalog</div>
+                <div class="arch-box ext">SQL Warehouse</div>
+                <div class="arch-box ext">Model Serving</div>
+              </div>
+              <div class="arch-row multi">
+                <div class="arch-box ext">Lakebase</div>
+                <div class="arch-box ext">MLflow</div>
+                <div class="arch-box ext">Delta state</div>
               </div>
             </div>
-            <a href="https://github.com/databricks-solutions/databricks-genie-workbench" target="_blank" class="btn-link">View on GitHub →</a>
           </div>
-        </div>
+        </section>
 
-        <!-- Architecture diagram (text-based) -->
-        <div class="arch-block">
-          <h3>Workbench Architecture</h3>
-          <div class="arch-diagram">
-            <div class="arch-row">
-              <div class="arch-box proxy">Reverse Proxy (OBO)</div>
-            </div>
-            <div class="arch-arrow">↓</div>
-            <div class="arch-row">
-              <div class="arch-box backend">FastAPI Backend
-                <div class="arch-sub">Routers: analysis · spaces · admin · create · auto_optimize</div>
-                <div class="arch-sub">Services: auth · genie · llm · lakebase · scanner</div>
-              </div>
-            </div>
-            <div class="arch-arrow">↓</div>
-            <div class="arch-row multi">
-              <div class="arch-box ext">Genie API</div>
-              <div class="arch-box ext">Unity Catalog</div>
-              <div class="arch-box ext">SQL Warehouse</div>
-              <div class="arch-box ext">Model Serving</div>
-            </div>
-            <div class="arch-row multi">
-              <div class="arch-box ext">Lakebase</div>
-              <div class="arch-box ext">MLflow</div>
-              <div class="arch-box ext">Delta (GSO state)</div>
+        <section id="tab-quiz" class="tab-panel" role="tabpanel">
+          <div class="card-header compact">
+            <span class="agenda-num">03</span>
+            <div>
+              <h2>Sample Quiz</h2>
+              <p class="card-sub">Built-in questions to reinforce Genie and platform best practices.</p>
             </div>
           </div>
-        </div>
+
+          <div class="quiz-list">
+            <article class="quiz-card" data-answer="b">
+              <h3>1. What is the best CI/CD gate before promoting a Genie change?</h3>
+              <div class="quiz-options">
+                <button class="quiz-option" data-choice="a">Rely on manual spot checks only</button>
+                <button class="quiz-option" data-choice="b">Run benchmark regression tests against representative questions</button>
+                <button class="quiz-option" data-choice="c">Publish first and monitor later</button>
+              </div>
+              <p class="quiz-feedback"></p>
+            </article>
+
+            <article class="quiz-card" data-answer="c">
+              <h3>2. When is a Supervisor Agent most useful?</h3>
+              <div class="quiz-options">
+                <button class="quiz-option" data-choice="a">When one table answers every question</button>
+                <button class="quiz-option" data-choice="b">When there is no need for tools or routing</button>
+                <button class="quiz-option" data-choice="c">When a question spans multiple domains, agents, or tools</button>
+              </div>
+              <p class="quiz-feedback"></p>
+            </article>
+
+            <article class="quiz-card" data-answer="a">
+              <h3>3. What helps a Genie space stay trustworthy for executives?</h3>
+              <div class="quiz-options">
+                <button class="quiz-option" data-choice="a">Clear semantic definitions, curated examples, and governed data</button>
+                <button class="quiz-option" data-choice="b">Large prompts without benchmark coverage</button>
+                <button class="quiz-option" data-choice="c">Using every table available regardless of relevance</button>
+              </div>
+              <p class="quiz-feedback"></p>
+            </article>
+          </div>
+        </section>
       </div>
 
       <!-- ─── Resources & Links ─── -->
@@ -308,6 +324,8 @@
 
   </main>
 
+  <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/examples/js/controls/OrbitControls.js"></script>
   <script src="script.js"></script>
 </body>
 </html>
