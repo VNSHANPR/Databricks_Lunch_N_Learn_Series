@@ -943,6 +943,50 @@ a.db-work-tile:hover { transform: translateY(-2px); border-color: var(--accent);
 .routing-rules li { font-size: .85rem; color: var(--text-secondary); padding: .3rem 0; line-height: 1.5; }
 .routing-rules li strong { color: var(--text-primary); font-weight: 600; }
 
+/* ============ INTERACTIVE 3D ARCHITECTURE SCENE ============ */
+.arch-scene-shell {
+  position: relative;
+  margin-bottom: 1rem;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 50% 15%, rgba(255,54,33,.12), transparent 45%),
+    linear-gradient(180deg, rgba(22,27,34,.98), rgba(13,17,23,1));
+}
+.arch-scene { width: 100%; height: 580px; }
+.arch-scene canvas { display: block; cursor: grab; }
+.arch-scene canvas:active { cursor: grabbing; }
+.arch-scene-hint {
+  position: absolute; left: 1rem; bottom: 1rem;
+  background: rgba(13,17,23,.72);
+  border: 1px solid rgba(255,255,255,.08);
+  color: var(--text-secondary);
+  padding: .5rem .8rem; border-radius: 999px;
+  font-size: .76rem; backdrop-filter: blur(10px);
+  pointer-events: none;
+}
+/* CSS2D labels (transform is owned by CSS2DRenderer — never set it here) */
+.arch3d-label {
+  display: block; width: 210px;
+  padding: .4rem .6rem; border-radius: 8px;
+  background: rgba(13,17,23,.85);
+  border: 1px solid rgba(255,255,255,.12);
+  border-left: 3px solid var(--c, #FF3621);
+  color: var(--text-primary); text-decoration: none;
+  font-family: var(--font-body);
+  pointer-events: auto;
+  box-shadow: 0 6px 18px rgba(0,0,0,.4);
+  transition: box-shadow .15s ease, border-color .15s ease, background .15s ease;
+}
+.arch3d-label:hover { text-decoration: none; background: rgba(20,26,34,.96); box-shadow: 0 10px 30px rgba(0,0,0,.6); }
+.arch3d-label b { display: block; font-size: .78rem; color: var(--c, #fff); font-weight: 700; letter-spacing: -.01em; }
+.arch3d-label span { display: block; font-size: .66rem; color: var(--text-secondary); line-height: 1.35; margin-top: .12rem; }
+.arch3d-gov { width: 250px; }
+.arch-fallback { display: none; }
+.arch-fallback.show { display: block; }
+@media (max-width: 900px) { .arch-scene { height: 440px; } }
+
 @media (max-width: 900px) {
   .db-arch { grid-template-columns: 1fr; }
   .db-work-grid { grid-template-columns: repeat(2, 1fr); }

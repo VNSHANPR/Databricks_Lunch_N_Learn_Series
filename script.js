@@ -11,6 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initScrollAnimations();
   initResourceTiles();
   initGalleryHints();
+  initArchitecture3D();
 });
 
 function initSessionNavigation() {
@@ -393,4 +394,208 @@ function roundRect(ctx, x, y, width, height, radius) {
   ctx.lineTo(x, y + radius);
   ctx.quadraticCurveTo(x, y, x + radius, y);
   ctx.closePath();
+}
+
+/* ============================================================
+   Interactive 3D Databricks platform architecture
+   Isometric stack of glowing tiers with crisp CSS2D labels that
+   link to the product docs. Grounded in the platform taxonomy.
+   ============================================================ */
+function initArchitecture3D() {
+  const container = document.getElementById('arch-scene');
+  if (!container) return;
+  const shell = document.querySelector('.arch-scene-shell');
+  const fallback = document.querySelector('.arch-fallback');
+  const showFallback = () => {
+    if (shell) shell.style.display = 'none';
+    if (fallback) fallback.classList.add('show');
+  };
+  if (typeof THREE === 'undefined' || !THREE.WebGLRenderer || !THREE.OrbitControls || !THREE.CSS2DRenderer) {
+    showFallback();
+    return;
+  }
+
+  let renderer;
+  try {
+    renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+  } catch (e) {
+    showFallback();
+    return;
+  }
+
+  const W = () => container.clientWidth || 800;
+  const H = () => container.clientHeight || 560;
+
+  const scene = new THREE.Scene();
+  scene.fog = new THREE.Fog(0x0d1117, 20, 46);
+
+  const camera = new THREE.PerspectiveCamera(38, W() / H(), 0.1, 1000);
+  camera.position.set(12, 9.5, 16);
+
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.setSize(W(), H());
+  renderer.domElement.style.display = 'block';
+  container.appendChild(renderer.domElement);
+
+  const labelRenderer = new THREE.CSS2DRenderer();
+  labelRenderer.setSize(W(), H());
+  labelRenderer.domElement.style.position = 'absolute';
+  labelRenderer.domElement.style.top = '0';
+  labelRenderer.domElement.style.left = '0';
+  labelRenderer.domElement.style.pointerEvents = 'none';
+  container.appendChild(labelRenderer.domElement);
+
+  const controls = new THREE.OrbitControls(camera, renderer.domElement);
+  controls.enableDamping = true;
+  controls.dampingFactor = 0.08;
+  controls.enablePan = false;
+  controls.minDistance = 12;
+  controls.maxDistance = 32;
+  controls.maxPolarAngle = Math.PI / 2.05;
+  controls.autoRotate = true;
+  controls.autoRotateSpeed = 0.5;
+  controls.target.set(0, 0.6, 0);
+
+  scene.add(new THREE.AmbientLight(0xffffff, 0.85));
+  const keyLight = new THREE.DirectionalLight(0xffffff, 1.1);
+  keyLight.position.set(8, 16, 10);
+  scene.add(keyLight);
+  const glow1 = new THREE.PointLight(0xff6f42, 1.4, 60);
+  glow1.position.set(-11, 6, 8);
+  scene.add(glow1);
+  const glow2 = new THREE.PointLight(0x2962ff, 1.2, 60);
+  glow2.position.set(11, 4, -8);
+  scene.add(glow2);
+
+  const disc = new THREE.Mesh(
+    new THREE.CircleGeometry(9.5, 64),
+    new THREE.MeshBasicMaterial({ color: 0xff3621, transparent: true, opacity: 0.06 })
+  );
+  disc.rotation.x = -Math.PI / 2;
+  disc.position.y = -4.0;
+  scene.add(disc);
+
+  // Tiers, bottom -> top, grounded in the Databricks product taxonomy.
+  const P = 'https://www.databricks.com/product/';
+  const tiers = [
+    { title: 'Your Cloud', products: 'AWS · Azure · Google Cloud', color: 0x8b949e, href: P + 'data-intelligence-platform', w: 7.4 },
+    { title: 'Open Lakehouse Storage', products: 'Delta Lake · Lakebase', color: 0x12b5cb, href: P + 'delta-lake-on-databricks', w: 6.6 },
+    { title: 'Data Intelligence Engine', products: 'Serverless · Photon · Databricks IQ', color: 0x2962ff, href: P + 'data-intelligence-platform', w: 5.9 },
+    { title: 'Data Engineering', products: 'Lakeflow: Connect · Pipelines · Jobs', color: 0x7c4dff, href: P + 'data-engineering', w: 5.2 },
+    { title: 'Data Warehousing & AI/BI', products: 'Databricks SQL · Dashboards · Genie', color: 0xff6f42, href: P + 'databricks-sql', w: 4.5 },
+    { title: 'Mosaic AI', products: 'MLflow · Model Serving · Vector Search · Agent Bricks', color: 0xff3621, href: P + 'artificial-intelligence', w: 3.8 },
+    { title: 'Apps & Consumers', products: 'Databricks Apps · Analysts · Agents', color: 0xffb020, href: P + 'data-intelligence-platform', w: 3.1 }
+  ];
+
+  const interactive = [];
+  const baseY = -3.3;
+  const step = 1.16;
+
+  const makeLabel = (title, products, color, href, cls) => {
+    const a = document.createElement('a');
+    a.href = href;
+    a.target = '_blank';
+    a.rel = 'noopener';
+    a.className = 'arch3d-label' + (cls ? ' ' + cls : '');
+    a.style.setProperty('--c', '#' + color.toString(16).padStart(6, '0'));
+    a.innerHTML = '<b>' + title + ' ↗</b><span>' + products + '</span>';
+    return new THREE.CSS2DObject(a);
+  };
+
+  tiers.forEach((t, i) => {
+    const y = baseY + i * step;
+    const geo = new THREE.BoxGeometry(t.w, 0.55, t.w);
+    const mat = new THREE.MeshStandardMaterial({
+      color: t.color, metalness: 0.25, roughness: 0.35,
+      transparent: true, opacity: 0.92, emissive: 0x000000
+    });
+    const mesh = new THREE.Mesh(geo, mat);
+    mesh.position.set(0, y, 0);
+    mesh.userData = { href: t.href, baseY: y, offset: i * 0.6, baseEmissive: 0x000000, baseEmInt: 0 };
+    mesh.add(new THREE.LineSegments(
+      new THREE.EdgesGeometry(geo),
+      new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.28 })
+    ));
+    const label = makeLabel(t.title, t.products, t.color, t.href);
+    label.position.set(t.w / 2 + 0.5, 0.15, 0);
+    mesh.add(label);
+    scene.add(mesh);
+    interactive.push(mesh);
+  });
+
+  // Unity Catalog governance beam spanning the full height.
+  const beamH = tiers.length * step + 0.4;
+  const beam = new THREE.Mesh(
+    new THREE.BoxGeometry(0.5, beamH, 0.5),
+    new THREE.MeshStandardMaterial({
+      color: 0x00a972, metalness: 0.3, roughness: 0.4,
+      transparent: true, opacity: 0.5, emissive: 0x00a972, emissiveIntensity: 0.28
+    })
+  );
+  beam.position.set(-4.6, baseY + beamH / 2 - 0.3, 0);
+  beam.userData = { href: P + 'unity-catalog', baseEmissive: 0x00a972, baseEmInt: 0.28 };
+  const beamLabel = makeLabel('Unity Catalog', 'Governance across all — Delta Sharing · Clean Rooms · Marketplace', 0x00a972, P + 'unity-catalog', 'arch3d-gov');
+  beamLabel.position.set(0, beamH / 2, 0);
+  beam.add(beamLabel);
+  scene.add(beam);
+  interactive.push(beam);
+
+  const ray = new THREE.Raycaster();
+  const ptr = new THREE.Vector2();
+  let hovered = null;
+  let hasPtr = false;
+  const setPtr = (e) => {
+    const r = renderer.domElement.getBoundingClientRect();
+    ptr.x = ((e.clientX - r.left) / r.width) * 2 - 1;
+    ptr.y = -((e.clientY - r.top) / r.height) * 2 + 1;
+    hasPtr = true;
+  };
+  renderer.domElement.addEventListener('pointermove', setPtr);
+  renderer.domElement.addEventListener('pointerleave', () => { hasPtr = false; });
+  renderer.domElement.addEventListener('click', () => {
+    if (hovered && hovered.userData.href) window.open(hovered.userData.href, '_blank', 'noopener');
+  });
+
+  const resize = () => {
+    camera.aspect = W() / H();
+    camera.updateProjectionMatrix();
+    renderer.setSize(W(), H());
+    labelRenderer.setSize(W(), H());
+  };
+  window.addEventListener('resize', resize);
+
+  function animate(time) {
+    const t = time * 0.001;
+    controls.update();
+
+    let next = null;
+    if (hasPtr) {
+      ray.setFromCamera(ptr, camera);
+      const hits = ray.intersectObjects(interactive, false);
+      next = hits.length ? hits[0].object : null;
+    }
+    if (hovered !== next) {
+      if (hovered) {
+        hovered.material.emissive.setHex(hovered.userData.baseEmissive);
+        hovered.material.emissiveIntensity = hovered.userData.baseEmInt;
+      }
+      hovered = next;
+      if (hovered) {
+        hovered.material.emissive.setHex(0xffffff);
+        hovered.material.emissiveIntensity = 0.22;
+      }
+      renderer.domElement.style.cursor = hovered ? 'pointer' : 'grab';
+    }
+
+    interactive.forEach((m) => {
+      if (m.userData.baseY !== undefined) {
+        m.position.y = m.userData.baseY + Math.sin(t + m.userData.offset) * 0.05;
+      }
+    });
+
+    renderer.render(scene, camera);
+    labelRenderer.render(scene, camera);
+    requestAnimationFrame(animate);
+  }
+  requestAnimationFrame(animate);
 }

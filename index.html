@@ -96,41 +96,52 @@
             </div>
           </div>
 
-          <div class="db-arch" role="group" aria-label="Interactive Databricks Data Intelligence Platform architecture — click any layer to open its Databricks page">
-            <a class="db-arch-gov" href="https://www.databricks.com/product/unity-catalog" target="_blank" rel="noopener">
-              <span class="db-arch-gov-label">Unity Catalog&nbsp;↗</span>
-              <span class="db-arch-gov-sub">One governance &amp; security layer across all data and AI — access, lineage, discovery</span>
-            </a>
-            <div class="db-arch-stack">
-              <a class="db-layer db-consume" href="https://www.databricks.com/product/data-intelligence-platform" target="_blank" rel="noopener">
-                <div class="db-layer-title">Who it serves&nbsp;↗</div>
-                <div class="db-layer-desc">Business users · Analysts · Executives · Customer-facing apps &amp; agents</div>
+          <div class="arch-scene-shell">
+            <div id="arch-scene" class="arch-scene" role="img" aria-label="Interactive 3D view of the Databricks Data Intelligence Platform — drag to rotate, click a layer to open its Databricks docs"></div>
+            <div class="arch-scene-hint">Drag to rotate · scroll to zoom · click a layer</div>
+          </div>
+
+          <!-- Flat, accessible fallback — shown if 3D/WebGL is unavailable -->
+          <div class="arch-fallback">
+            <div class="db-arch" role="group" aria-label="Databricks Data Intelligence Platform architecture — click any layer to open its Databricks page">
+              <a class="db-arch-gov" href="https://www.databricks.com/product/unity-catalog" target="_blank" rel="noopener">
+                <span class="db-arch-gov-label">Unity Catalog&nbsp;↗</span>
+                <span class="db-arch-gov-sub">Governance across all data &amp; AI — Delta Sharing · Clean Rooms · Marketplace</span>
               </a>
-              <div class="db-layer db-work">
-                <div class="db-layer-title">What you do with it — Workloads</div>
-                <div class="db-work-grid">
-                  <a class="db-work-tile" href="https://www.databricks.com/product/data-engineering" target="_blank" rel="noopener"><strong>Data Engineering&nbsp;↗</strong><span>Ingest &amp; prepare data — Lakeflow</span></a>
-                  <a class="db-work-tile" href="https://www.databricks.com/product/databricks-sql" target="_blank" rel="noopener"><strong>Warehousing &amp; BI&nbsp;↗</strong><span>SQL &amp; dashboards — Databricks SQL</span></a>
-                  <a class="db-work-tile" href="https://www.databricks.com/product/artificial-intelligence" target="_blank" rel="noopener"><strong>AI &amp; Machine Learning&nbsp;↗</strong><span>Models &amp; agents — Mosaic AI</span></a>
-                  <a class="db-work-tile" href="https://www.databricks.com/product/ai-bi/genie" target="_blank" rel="noopener"><strong>Genie &amp; Apps&nbsp;↗</strong><span>Ask-your-data &amp; custom apps</span></a>
-                </div>
+              <div class="db-arch-stack">
+                <a class="db-layer db-consume" href="https://www.databricks.com/product/data-intelligence-platform" target="_blank" rel="noopener">
+                  <div class="db-layer-title">Apps &amp; Consumers&nbsp;↗</div>
+                  <div class="db-layer-desc">Databricks Apps · Business users · Analysts · Agents</div>
+                </a>
+                <a class="db-layer db-work" href="https://www.databricks.com/product/artificial-intelligence" target="_blank" rel="noopener">
+                  <div class="db-layer-title">Mosaic AI&nbsp;↗</div>
+                  <div class="db-layer-desc">MLflow · Model Serving · Vector Search · Agent Bricks · AI Functions</div>
+                </a>
+                <a class="db-layer db-work" href="https://www.databricks.com/product/databricks-sql" target="_blank" rel="noopener">
+                  <div class="db-layer-title">Data Warehousing &amp; AI/BI&nbsp;↗</div>
+                  <div class="db-layer-desc">Databricks SQL · AI/BI Dashboards · Genie</div>
+                </a>
+                <a class="db-layer db-work" href="https://www.databricks.com/product/data-engineering" target="_blank" rel="noopener">
+                  <div class="db-layer-title">Data Engineering&nbsp;↗</div>
+                  <div class="db-layer-desc">Lakeflow — Connect · Declarative Pipelines · Jobs</div>
+                </a>
+                <a class="db-layer db-engine" href="https://www.databricks.com/product/data-intelligence-platform" target="_blank" rel="noopener">
+                  <div class="db-layer-title">Data Intelligence Engine&nbsp;↗</div>
+                  <div class="db-layer-desc">Serverless compute · Photon · Databricks IQ</div>
+                </a>
+                <a class="db-layer db-storage" href="https://www.databricks.com/product/delta-lake-on-databricks" target="_blank" rel="noopener">
+                  <div class="db-layer-title">Open Lakehouse Storage&nbsp;↗</div>
+                  <div class="db-layer-desc">Delta Lake · Lakebase</div>
+                </a>
+                <a class="db-layer db-cloud" href="https://www.databricks.com/product/data-intelligence-platform" target="_blank" rel="noopener">
+                  <div class="db-layer-title">Your Cloud&nbsp;↗</div>
+                  <div class="db-layer-desc">AWS · Azure · Google Cloud — your account</div>
+                </a>
               </div>
-              <a class="db-layer db-engine" href="https://www.databricks.com/product/data-intelligence-platform" target="_blank" rel="noopener">
-                <div class="db-layer-title">Data Intelligence Engine&nbsp;↗</div>
-                <div class="db-layer-desc">Serverless compute + Databricks IQ — the AI that understands your business data and its meaning</div>
-              </a>
-              <a class="db-layer db-storage" href="https://www.databricks.com/product/delta-lake-on-databricks" target="_blank" rel="noopener">
-                <div class="db-layer-title">Open Lakehouse Storage&nbsp;↗</div>
-                <div class="db-layer-desc">Delta Lake &amp; open formats — all your data in one open place, no lock-in</div>
-              </a>
-              <a class="db-layer db-cloud" href="https://www.databricks.com/product/data-intelligence-platform" target="_blank" rel="noopener">
-                <div class="db-layer-title">Your Cloud&nbsp;↗</div>
-                <div class="db-layer-desc">Runs in your own AWS, Azure &amp; Google Cloud account — your data stays with you</div>
-              </a>
             </div>
           </div>
 
-          <p class="arch-read-note"><strong>Interactive —</strong> click any layer or tool to open its Databricks page. Read it bottom-up: your <strong>cloud</strong> holds <strong>open storage</strong>, the <strong>intelligence engine</strong> turns it into answers, <strong>workloads</strong> put it to work, and everyone from analysts to agents consumes it, with <strong>Unity Catalog</strong> governing every layer.</p>
+          <p class="arch-read-note"><strong>Interactive 3D —</strong> drag to rotate, scroll to zoom, and click any layer to open its Databricks docs. Grounded in the platform's product taxonomy: your <strong>cloud</strong> holds the <strong>open lakehouse</strong>, the <strong>intelligence engine</strong> powers <strong>Data Engineering</strong>, <strong>Warehousing &amp; AI/BI</strong> and <strong>Mosaic AI</strong>, all consumed through <strong>apps</strong> and governed end-to-end by <strong>Unity Catalog</strong>.</p>
 
           <div class="confidential-note">
             Roadmap details and future-state commentary are shared live during the session.
@@ -712,6 +723,9 @@ AsyncDatabricksStore(
 
   </main>
 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/renderers/CSS2DRenderer.js"></script>
   <script src="script.js"></script>
 </body>
 </html>
