@@ -929,6 +929,20 @@ body::before {
 }
 .arch-read-note strong { color: var(--text-primary); font-weight: 600; }
 
+/* interactive (clickable) architecture layers → Databricks docs */
+a.db-arch-gov, a.db-layer { display: block; text-decoration: none; color: inherit; cursor: pointer; }
+a.db-work-tile { text-decoration: none; color: inherit; cursor: pointer; transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease; }
+a.db-layer:hover, a.db-arch-gov:hover, a.db-work-tile:hover { text-decoration: none; }
+a.db-layer:hover { box-shadow: 0 8px 24px rgba(0,0,0,.32); }
+a.db-arch-gov:hover { box-shadow: 0 8px 24px rgba(0,169,114,.28); border-color: rgba(0,169,114,.9); }
+a.db-work-tile:hover { transform: translateY(-2px); border-color: var(--accent); box-shadow: 0 6px 18px rgba(255,54,33,.18); }
+/* the Workloads band itself shouldn't shift when a tile inside it is hovered */
+.db-layer.db-work:hover { transform: none; border-color: var(--border); }
+
+.routing-rules { margin: 0; padding-left: 1.4rem; }
+.routing-rules li { font-size: .85rem; color: var(--text-secondary); padding: .3rem 0; line-height: 1.5; }
+.routing-rules li strong { color: var(--text-primary); font-weight: 600; }
+
 @media (max-width: 900px) {
   .db-arch { grid-template-columns: 1fr; }
   .db-work-grid { grid-template-columns: repeat(2, 1fr); }
