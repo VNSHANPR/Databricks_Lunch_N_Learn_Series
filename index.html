@@ -82,7 +82,9 @@
       <div class="content-card tabs-card">
         <div class="agenda-tabs" role="tablist" aria-label="Agenda tabs">
           <button class="agenda-tab active" data-tab="tab-roadmap" role="tab" aria-selected="true">Roadmap</button>
-          <button class="agenda-tab" data-tab="tab-genie" role="tab" aria-selected="false">Genie Agents &amp; Supervisor Best Practices</button>
+          <button class="agenda-tab" data-tab="tab-genie" role="tab" aria-selected="false">Genie</button>
+          <button class="agenda-tab" data-tab="tab-tools" role="tab" aria-selected="false">Tools</button>
+          <button class="agenda-tab" data-tab="tab-supervisor" role="tab" aria-selected="false">Supervisor Agent</button>
           <button class="agenda-tab" data-tab="tab-memory" role="tab" aria-selected="false">Agent Memory</button>
           <button class="agenda-tab" data-tab="tab-quiz" role="tab" aria-selected="false">Quiz</button>
         </div>
@@ -108,12 +110,13 @@
           </div>
         </section>
 
+        <!-- ═══════════════  GENIE  ═══════════════ -->
         <section id="tab-genie" class="tab-panel" role="tabpanel">
           <div class="card-header compact">
             <span class="agenda-num">02</span>
             <div>
-              <h2>Genie Agents &amp; Supervisor Best Practices</h2>
-              <p class="card-sub">Design, CI/CD, observability, and multi-agent operating patterns.</p>
+              <h2>Genie — Best Practices</h2>
+              <p class="card-sub">Build, curate and tune high-quality Genie agents grounded in governed data.</p>
             </div>
           </div>
 
@@ -127,14 +130,13 @@
                 <li>Use dev, test, and production promotion gates for safer rollout</li>
               </ul>
             </div>
-
-            <div class="info-block highlight">
-              <h3>Supervisor patterns</h3>
+            <div class="info-block">
+              <h3>Executive talking points</h3>
               <ul class="checklist">
-                <li>Use Supervisor Agent for multi-domain questions across tools or subagents</li>
-                <li>Write precise tool and subagent descriptions for better routing</li>
-                <li>Apply least-privilege access so users only reach permitted sources</li>
-                <li>Keep examples current and representative of executive workflows</li>
+                <li>Governed self-service reduces time to insight</li>
+                <li>Benchmarking and CI/CD reduce trust erosion from regressions</li>
+                <li>Supervisor patterns unify data, documents, and actions behind one entry point</li>
+                <li>Observability makes AI experiences measurable and improvable</li>
               </ul>
             </div>
           </div>
@@ -162,62 +164,8 @@
                 </div>
               </div>
             </div>
-          </div>
-
-          <div class="two-col">
-            <div class="info-block">
-              <h3>Genie Workbench</h3>
-              <p>A Databricks App for scanning Genie spaces, identifying issues, and guiding remediation using benchmarking, optimization, and observability workflows.</p>
-              <div class="workbench-features">
-                <div class="wb-feature">
-                  <strong>IQ Scanner</strong>
-                  <span>12 rule-based checks across maturity tiers</span>
-                </div>
-                <div class="wb-feature">
-                  <strong>Auto-Optimize</strong>
-                  <span>Benchmark quality control and iterative optimization loop</span>
-                </div>
-                <div class="wb-feature">
-                  <strong>GenieWatch</strong>
-                  <span>Usage, cost, feedback, and executed-resource observability</span>
-                </div>
-              </div>
-              <a href="https://github.com/databricks-solutions/databricks-genie-workbench" target="_blank" class="btn-link">View on GitHub →</a>
-            </div>
-
-            <div class="info-block">
-              <h3>Executive talking points</h3>
-              <ul class="checklist">
-                <li>Governed self-service reduces time to insight</li>
-                <li>Benchmarking and CI/CD reduce trust erosion from regressions</li>
-                <li>Supervisor patterns unify data, documents, and actions behind one entry point</li>
-                <li>Observability makes AI experiences measurable and improvable</li>
-              </ul>
-            </div>
-          </div>
-
-          <div class="arch-block">
-            <h3>What Genie Workbench scores — the IQ Scanner (12 checks)</h3>
-            <p class="card-sub" style="margin-bottom:1rem;">Each space gets a 0–12 score across three tiers: <strong>Not Ready</strong> → <strong>Ready to Optimize</strong> (checks 1–10) → <strong>Trusted</strong> (all 12). Baseline every space here <em>before</em> wiring it into a Supervisor.</p>
-            <div class="check-grid">
-              <div class="wb-feature"><strong>1 · Agent description</strong><span>Clear top-level description — also drives supervisor routing</span></div>
-              <div class="wb-feature"><strong>2 · Table descriptions</strong><span>≥80% of tables described (auto-enriched from Unity Catalog)</span></div>
-              <div class="wb-feature"><strong>3 · Column descriptions</strong><span>≥50% of columns described</span></div>
-              <div class="wb-feature"><strong>4 · Instructions</strong><span>Business-context text instructions present</span></div>
-              <div class="wb-feature"><strong>5 · Join specifications</strong><span>≥1 join defined when multiple tables are configured</span></div>
-              <div class="wb-feature"><strong>6 · Focused scope</strong><span>Between 1 and 12 tables / metric views — keeps the space tight</span></div>
-              <div class="wb-feature"><strong>7 · SQL guidance</strong><span>≥1 of: SQL functions, expressions, measures, filters, example SQL</span></div>
-              <div class="wb-feature"><strong>8 · Entity / format matching</strong><span>≥1 column with value/format assistance for accurate filters</span></div>
-              <div class="wb-feature"><strong>9 · Benchmark questions</strong><span>≥10 benchmark questions for measurable accuracy</span></div>
-              <div class="wb-feature"><strong>10 · Column noise control</strong><span>Noisy / internal columns hidden from the model</span></div>
-              <div class="wb-feature"><strong>11 · Optimization run</strong><span>A completed Auto-Optimize run exists</span></div>
-              <div class="wb-feature"><strong>12 · Accuracy ≥ 85%</strong><span>Best optimized benchmark accuracy clears the bar</span></div>
-            </div>
-          </div>
-
-          <div class="two-col">
             <div class="info-block highlight">
-              <h3>Best practices these checks encode</h3>
+              <h3>Best practices that make Genie trustworthy</h3>
               <ul class="checklist">
                 <li>Prefer structured context (descriptions, synonyms, joins, example SQL) over long free-text prompts</li>
                 <li>Keep each space small and domain-focused — aim for 5 or fewer sources</li>
@@ -227,22 +175,11 @@
                 <li>Set a strong agent description — it doubles as the Supervisor's routing signal</li>
               </ul>
             </div>
-            <div class="info-block">
-              <h3>How to apply it</h3>
-              <ul class="checklist">
-                <li>Scan each existing Genie space to get a baseline IQ score</li>
-                <li>Close the failing checks (descriptions, joins, benchmarks) to reach "Ready to Optimize"</li>
-                <li>Run Auto-Optimize to push benchmark accuracy past 85%</li>
-                <li>Only then add the space to a Supervisor — quality first, orchestration second</li>
-                <li>Re-scan after schema changes to catch drift</li>
-              </ul>
-              <p class="card-sub" style="margin-top:.5rem;">Genie Workbench is a Databricks "solutions" project — community-supported via GitHub, not official Databricks support.</p>
-            </div>
           </div>
 
           <div class="arch-block">
             <h3>More ways to improve a Genie space — from the tuning guide</h3>
-            <p class="card-sub" style="margin-bottom:1rem;">Beyond the IQ checks above, the official <a href="https://docs.databricks.com/aws/en/genie/tune-quality" target="_blank" class="btn-link">Genie tuning guide</a> recommends these — most are structured surfaces, not prose.</p>
+            <p class="card-sub" style="margin-bottom:1rem;">The official <a href="https://docs.databricks.com/aws/en/genie/tune-quality" target="_blank" class="btn-link">Genie tuning guide</a> recommends these — most are structured surfaces, not prose.</p>
             <div class="two-col">
               <div class="info-block">
                 <h3>SQL expressions &amp; examples</h3>
@@ -284,20 +221,154 @@
               </div>
             </div>
           </div>
+        </section>
 
-          <div class="arch-block">
-            <h3>Trace &amp; evaluate Genie with MLflow — the cookbook</h3>
-            <p class="card-sub" style="margin-bottom:1rem;">A ready-made MLflow recipe — turn Genie conversations into traces, score them with LLM judges, and generate copy-paste fixes. <a href="https://mlflow.org/cookbook/databricks-genie/" target="_blank" class="btn-link">Open the cookbook →</a></p>
-            <div class="check-grid">
-              <div class="wb-feature"><strong>1 · Conversation tracing</strong><span>Each Genie conversation becomes an MLflow trace you can inspect, search &amp; compare</span></div>
-              <div class="wb-feature"><strong>2 · LLM-judge evaluation</strong><span>Built-in + custom judges score every trace so you see exactly which conversations failed</span></div>
-              <div class="wb-feature"><strong>3 · Improvement generation</strong><span>Failed traces feed an LLM that generates copy-paste-ready Genie config fixes</span></div>
+        <!-- ═══════════════  TOOLS  ═══════════════ -->
+        <section id="tab-tools" class="tab-panel" role="tabpanel">
+          <div class="card-header compact">
+            <span class="agenda-num">03</span>
+            <div>
+              <h2>Tools</h2>
+              <p class="card-sub">Assets that assess, tune, trace and evaluate your Genie and Supervisor agents.</p>
             </div>
-            <p class="card-sub" style="margin-top:.75rem;">Setup: <code>pip install "mlflow[genai]" databricks-sdk openai</code></p>
+          </div>
+
+          <div class="two-col">
+            <div class="info-block">
+              <h3>Genie Workbench</h3>
+              <p>A Databricks App for scanning Genie spaces, identifying issues, and guiding remediation using benchmarking, optimization, and observability workflows.</p>
+              <div class="workbench-features">
+                <div class="wb-feature">
+                  <strong>IQ Scanner</strong>
+                  <span>12 rule-based checks across maturity tiers</span>
+                </div>
+                <div class="wb-feature">
+                  <strong>Auto-Optimize</strong>
+                  <span>Benchmark quality control and iterative optimization loop</span>
+                </div>
+                <div class="wb-feature">
+                  <strong>GenieWatch</strong>
+                  <span>Usage, cost, feedback, and executed-resource observability</span>
+                </div>
+              </div>
+              <a href="https://github.com/databricks-solutions/databricks-genie-workbench" target="_blank" class="btn-link">View on GitHub →</a>
+            </div>
+            <div class="info-block">
+              <h3>How to use it</h3>
+              <ul class="checklist">
+                <li>Scan each existing Genie space to get a baseline IQ score</li>
+                <li>Close the failing checks (descriptions, joins, benchmarks) to reach "Ready to Optimize"</li>
+                <li>Run Auto-Optimize to push benchmark accuracy past 85%</li>
+                <li>Only then add the space to a Supervisor — quality first, orchestration second</li>
+                <li>Re-scan after schema changes to catch drift</li>
+              </ul>
+              <p class="card-sub" style="margin-top:.5rem;">Genie Workbench is a Databricks "solutions" project — community-supported via GitHub, not official Databricks support.</p>
+            </div>
           </div>
 
           <div class="arch-block">
-            <h3>Directing the Supervisor Agent — routing that doesn't get lost</h3>
+            <h3>What Genie Workbench scores — the IQ Scanner (12 checks)</h3>
+            <p class="card-sub" style="margin-bottom:1rem;">Each space gets a 0–12 score across three tiers: <strong>Not Ready</strong> → <strong>Ready to Optimize</strong> (checks 1–10) → <strong>Trusted</strong> (all 12). Baseline every space here <em>before</em> wiring it into a Supervisor.</p>
+            <div class="check-grid">
+              <div class="wb-feature"><strong>1 · Agent description</strong><span>Clear top-level description — also drives supervisor routing</span></div>
+              <div class="wb-feature"><strong>2 · Table descriptions</strong><span>≥80% of tables described (auto-enriched from Unity Catalog)</span></div>
+              <div class="wb-feature"><strong>3 · Column descriptions</strong><span>≥50% of columns described</span></div>
+              <div class="wb-feature"><strong>4 · Instructions</strong><span>Business-context text instructions present</span></div>
+              <div class="wb-feature"><strong>5 · Join specifications</strong><span>≥1 join defined when multiple tables are configured</span></div>
+              <div class="wb-feature"><strong>6 · Focused scope</strong><span>Between 1 and 12 tables / metric views — keeps the space tight</span></div>
+              <div class="wb-feature"><strong>7 · SQL guidance</strong><span>≥1 of: SQL functions, expressions, measures, filters, example SQL</span></div>
+              <div class="wb-feature"><strong>8 · Entity / format matching</strong><span>≥1 column with value/format assistance for accurate filters</span></div>
+              <div class="wb-feature"><strong>9 · Benchmark questions</strong><span>≥10 benchmark questions for measurable accuracy</span></div>
+              <div class="wb-feature"><strong>10 · Column noise control</strong><span>Noisy / internal columns hidden from the model</span></div>
+              <div class="wb-feature"><strong>11 · Optimization run</strong><span>A completed Auto-Optimize run exists</span></div>
+              <div class="wb-feature"><strong>12 · Accuracy ≥ 85%</strong><span>Best optimized benchmark accuracy clears the bar</span></div>
+            </div>
+          </div>
+
+          <div class="arch-block">
+            <h3>Genie Workbench architecture</h3>
+            <div class="arch-diagram">
+              <div class="arch-row">
+                <div class="arch-box proxy">Reverse Proxy (OBO)</div>
+              </div>
+              <div class="arch-arrow">↓</div>
+              <div class="arch-row">
+                <div class="arch-box backend">FastAPI Backend
+                  <div class="arch-sub">Routers: analysis · spaces · admin · create · auto_optimize</div>
+                  <div class="arch-sub">Services: auth · genie · llm · lakebase · scanner</div>
+                </div>
+              </div>
+              <div class="arch-arrow">↓</div>
+              <div class="arch-row multi">
+                <div class="arch-box ext">Genie API</div>
+                <div class="arch-box ext">Unity Catalog</div>
+                <div class="arch-box ext">SQL Warehouse</div>
+                <div class="arch-box ext">Model Serving</div>
+              </div>
+              <div class="arch-row multi">
+                <div class="arch-box ext">Lakebase</div>
+                <div class="arch-box ext">MLflow</div>
+                <div class="arch-box ext">Delta state</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="arch-block">
+            <h3>MLflow tracing &amp; evaluation notebooks</h3>
+            <p class="card-sub" style="margin-bottom:1rem;">Ready-to-use assets for tracing agents and scoring them with LLM judges.</p>
+            <div class="two-col">
+              <div class="info-block">
+                <h3>Genie evaluation cookbook</h3>
+                <p>Turn Genie conversations into MLflow traces, score them with built-in &amp; custom LLM judges, and generate copy-paste-ready config fixes.</p>
+                <div class="workbench-features">
+                  <div class="wb-feature"><strong>1 · Conversation tracing</strong><span>Each conversation becomes an inspectable, comparable trace</span></div>
+                  <div class="wb-feature"><strong>2 · LLM-judge evaluation</strong><span>Judges score every trace to surface exactly what failed</span></div>
+                  <div class="wb-feature"><strong>3 · Improvement generation</strong><span>Failed traces feed an LLM that emits config fixes</span></div>
+                </div>
+                <a href="https://mlflow.org/cookbook/databricks-genie/" target="_blank" class="btn-link">Open the cookbook →</a>
+              </div>
+              <div class="info-block">
+                <h3>Agent evaluation notebook</h3>
+                <p>A ready-to-run MLflow notebook: a <code>predict_fn</code> against a deployed agent, built-in judges (Correctness, RelevanceToQuery, Guidelines) plus a custom trace-based tool-use judge, and a routing-accuracy template for supervisors.</p>
+                <p class="card-sub">Setup: <code>pip install "mlflow[genai]" databricks-sdk openai</code></p>
+                <a href="https://docs.databricks.com/aws/en/mlflow3/genai/eval-monitor" target="_blank" class="btn-link">Eval &amp; monitoring docs →</a>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ═══════════════  SUPERVISOR AGENT  ═══════════════ -->
+        <section id="tab-supervisor" class="tab-panel" role="tabpanel">
+          <div class="card-header compact">
+            <span class="agenda-num">04</span>
+            <div>
+              <h2>Supervisor Agent</h2>
+              <p class="card-sub">Orchestrate multiple Genie agents, Knowledge Assistants and tools behind one entry point — with reliable routing, governance and evaluation.</p>
+            </div>
+          </div>
+
+          <div class="two-col">
+            <div class="info-block">
+              <h3>When to use a Supervisor</h3>
+              <ul class="checklist">
+                <li>A question spans multiple domains, agents, or tools</li>
+                <li>Users shouldn't need to know which agent to ask</li>
+                <li>You want one governed entry point over many Genie spaces, Knowledge Assistants and tools</li>
+              </ul>
+            </div>
+            <div class="info-block highlight">
+              <h3>Supervisor patterns</h3>
+              <ul class="checklist">
+                <li>Use Supervisor Agent for multi-domain questions across tools or subagents</li>
+                <li>Write precise tool and subagent descriptions for better routing</li>
+                <li>Apply least-privilege access so users only reach permitted sources</li>
+                <li>Keep examples current and representative of executive workflows</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="arch-block">
+            <h3>Directing the Supervisor — routing that doesn't get lost</h3>
             <p class="card-sub" style="margin-bottom:1rem;">A Supervisor routes each question to one child agent based on its description. Misrouting is almost always a description / instruction problem — not a model problem.</p>
             <div class="two-col">
               <div class="info-block">
@@ -435,41 +506,12 @@
                 <a href="https://docs.databricks.com/aws/en/mlflow3/genai/eval-monitor" target="_blank" class="btn-link">Eval &amp; monitoring docs →</a>
               </div>
             </div>
-            <p class="card-sub" style="margin-top:.5rem;">The docs link a 10-minute demo notebook for agent evaluation. Want a ready-to-run notebook wired to your <code>agent-langgraph-advanced</code> endpoint? I can generate one.</p>
-          </div>
-
-          <div class="arch-block">
-            <h3>Workbench Architecture</h3>
-            <div class="arch-diagram">
-              <div class="arch-row">
-                <div class="arch-box proxy">Reverse Proxy (OBO)</div>
-              </div>
-              <div class="arch-arrow">↓</div>
-              <div class="arch-row">
-                <div class="arch-box backend">FastAPI Backend
-                  <div class="arch-sub">Routers: analysis · spaces · admin · create · auto_optimize</div>
-                  <div class="arch-sub">Services: auth · genie · llm · lakebase · scanner</div>
-                </div>
-              </div>
-              <div class="arch-arrow">↓</div>
-              <div class="arch-row multi">
-                <div class="arch-box ext">Genie API</div>
-                <div class="arch-box ext">Unity Catalog</div>
-                <div class="arch-box ext">SQL Warehouse</div>
-                <div class="arch-box ext">Model Serving</div>
-              </div>
-              <div class="arch-row multi">
-                <div class="arch-box ext">Lakebase</div>
-                <div class="arch-box ext">MLflow</div>
-                <div class="arch-box ext">Delta state</div>
-              </div>
-            </div>
           </div>
         </section>
 
         <section id="tab-memory" class="tab-panel" role="tabpanel">
           <div class="card-header compact">
-            <span class="agenda-num">03</span>
+            <span class="agenda-num">05</span>
             <div>
               <h2>Agent Memory</h2>
               <p class="card-sub">Give your agents persistence — short-term session state and long-term semantic recall, powered by Lakebase.</p>
@@ -561,7 +603,7 @@ AsyncDatabricksStore(
 
         <section id="tab-quiz" class="tab-panel" role="tabpanel">
           <div class="card-header compact">
-            <span class="agenda-num">04</span>
+            <span class="agenda-num">06</span>
             <div>
               <h2>Sample Quiz</h2>
               <p class="card-sub">Built-in questions to reinforce Genie and platform best practices.</p>
@@ -658,22 +700,6 @@ AsyncDatabricksStore(
             <strong>Screenshots &amp; GIFs</strong>
             <span class="resource-desc">Coming soon</span>
           </a>
-        </div>
-      </div>
-
-      <!-- Media Gallery Placeholder -->
-      <div class="content-card">
-        <div class="card-header">
-          <span class="agenda-num">🖼️</span>
-          <div>
-            <h2>Media Gallery</h2>
-            <p class="card-sub">Screenshots and GIFs from the session demos</p>
-          </div>
-        </div>
-        <div class="gallery-placeholder">
-          <div class="gallery-slot"><span>+</span><p>Add screenshot</p></div>
-          <div class="gallery-slot"><span>+</span><p>Add GIF</p></div>
-          <div class="gallery-slot"><span>+</span><p>Add screenshot</p></div>
         </div>
       </div>
 
