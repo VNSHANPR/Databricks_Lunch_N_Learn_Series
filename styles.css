@@ -985,6 +985,24 @@ a.db-work-tile:hover { transform: translateY(-2px); border-color: var(--accent);
 .arch3d-gov { width: 250px; }
 .arch-fallback { display: none; }
 .arch-fallback.show { display: block; }
+
+/* Platform architecture image (from databricks.com/product/platform) */
+.arch-figure {
+  margin: 0 0 1rem;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  overflow: hidden;
+  background: var(--bg-secondary);
+}
+.arch-figure a { display: block; }
+.arch-figure img { display: block; width: 100%; height: auto; }
+.arch-figure figcaption {
+  padding: .7rem 1rem;
+  font-size: .78rem;
+  color: var(--text-secondary);
+  border-top: 1px solid var(--border);
+}
+.arch-figure figcaption a { color: var(--accent); }
 @media (max-width: 900px) { .arch-scene { height: 440px; } }
 
 @media (max-width: 900px) {
