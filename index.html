@@ -85,6 +85,7 @@
           <button class="agenda-tab" data-tab="tab-genie" role="tab" aria-selected="false">Genie</button>
           <button class="agenda-tab" data-tab="tab-tools" role="tab" aria-selected="false">Tools</button>
           <button class="agenda-tab" data-tab="tab-supervisor" role="tab" aria-selected="false">Supervisor Agent</button>
+          <button class="agenda-tab" data-tab="tab-cicd" role="tab" aria-selected="false">CI/CD</button>
           <button class="agenda-tab" data-tab="tab-memory" role="tab" aria-selected="false">Agent Memory</button>
           <button class="agenda-tab" data-tab="tab-quiz" role="tab" aria-selected="false">Quiz</button>
         </div>
@@ -509,9 +510,82 @@
           </div>
         </section>
 
-        <section id="tab-memory" class="tab-panel" role="tabpanel">
+        <!-- ═══════════════  CI/CD  ═══════════════ -->
+        <section id="tab-cicd" class="tab-panel" role="tabpanel">
           <div class="card-header compact">
             <span class="agenda-num">05</span>
+            <div>
+              <h2>CI/CD — ship the whole agent stack as code</h2>
+              <p class="card-sub">One consolidated Declarative Automation Bundle (DABs) that promotes the entire oCFO agent platform across dev → preprod → prod workspaces.</p>
+            </div>
+          </div>
+
+          <div class="two-col">
+            <div class="info-block">
+              <h3>What the bundle ships</h3>
+              <ul class="checklist">
+                <li><strong>Data layer</strong> — governed UC function tools + certified metric views (catalog-parameterized, idempotent)</li>
+                <li><strong>Genie layer</strong> — curated Genie spaces from versioned <code>serialized_space</code> JSON (create-or-update, catalog remap)</li>
+                <li><strong>Supervisor</strong> — Multi-Agent Supervisor wiring the Genie spaces + Knowledge Assistant subagent + UC tools, with routing rules &amp; examples</li>
+                <li>All <strong>tools and instructions live in the bundle</strong> — edit, commit, redeploy</li>
+              </ul>
+              <a href="https://github.com/VNSHANPR/ocfo-agent-platform" target="_blank" class="btn-link">View the DABs project on GitHub →</a>
+            </div>
+            <div class="info-block highlight">
+              <h3>Promotion model (dev → preprod → prod)</h3>
+              <ul class="checklist">
+                <li>Everything is <strong>catalog-parameterized</strong>; each environment sets its own <code>catalog</code></li>
+                <li>Genie JSON is the <strong>source of truth</strong> — every workspace converges on redeploy</li>
+                <li><code>mode: development</code> vs <code>mode: production</code> targets with per-env variables</li>
+                <li>A single job orchestrates: data layer → Genie spaces → supervisor</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="arch-block">
+            <h3>Bundle layout</h3>
+            <div class="terminal-card code-terminal">
+              <div class="terminal-header">
+                <span class="terminal-dot red"></span><span class="terminal-dot amber"></span><span class="terminal-dot green"></span>
+                <span class="terminal-title">ocfo-agent-platform/</span>
+              </div>
+              <div class="terminal-body code-body">
+<pre class="code-block">databricks.yml                       <span class="comment"># bundle · variables · dev/preprod/prod targets</span>
+config/supervisor_instructions.yml   <span class="comment"># master prompt · routing rules · agent descriptions</span>
+genie/manifest.json + genie_*.json   <span class="comment"># versioned serialized_space for each Genie space</span>
+src/deploy_data_layer.py             <span class="comment"># UC functions + metric views (idempotent)</span>
+src/deploy_genie_spaces.py           <span class="comment"># create-or-update Genie spaces, remap catalog</span>
+src/create_supervisor.py             <span class="comment"># assemble + deploy the supervisor</span>
+resources/ocfo_platform.job.yml      <span class="comment"># job: data layer → genie → supervisor</span></pre>
+              </div>
+            </div>
+          </div>
+
+          <div class="arch-block">
+            <h3>Deploy &amp; promote</h3>
+            <div class="terminal-card code-terminal">
+              <div class="terminal-header">
+                <span class="terminal-dot red"></span><span class="terminal-dot amber"></span><span class="terminal-dot green"></span>
+                <span class="terminal-title">promote.sh</span>
+              </div>
+              <div class="terminal-body code-body">
+<pre class="code-block"><span class="comment"># dev</span>
+databricks bundle validate --target dev
+databricks bundle deploy   --target dev
+databricks bundle run ocfo_agent_platform_deploy --target dev
+
+<span class="comment"># promote the same code to preprod, then prod</span>
+databricks bundle deploy --target preprod &amp;&amp; databricks bundle run ocfo_agent_platform_deploy --target preprod
+databricks bundle deploy --target prod    &amp;&amp; databricks bundle run ocfo_agent_platform_deploy --target prod</pre>
+              </div>
+            </div>
+            <p class="card-sub" style="margin-top:.75rem;">No native DABs resource exists for Genie spaces, so they deploy via the versioned-JSON + <code>/api/2.0/genie/spaces</code> create-or-update pattern — fully promotable IaC.</p>
+          </div>
+        </section>
+
+        <section id="tab-memory" class="tab-panel" role="tabpanel">
+          <div class="card-header compact">
+            <span class="agenda-num">06</span>
             <div>
               <h2>Agent Memory</h2>
               <p class="card-sub">Give your agents persistence — short-term session state and long-term semantic recall, powered by Lakebase.</p>
@@ -603,7 +677,7 @@ AsyncDatabricksStore(
 
         <section id="tab-quiz" class="tab-panel" role="tabpanel">
           <div class="card-header compact">
-            <span class="agenda-num">06</span>
+            <span class="agenda-num">07</span>
             <div>
               <h2>Sample Quiz</h2>
               <p class="card-sub">Built-in questions to reinforce Genie and platform best practices.</p>
