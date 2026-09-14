@@ -525,40 +525,96 @@
               <h3>What the bundle ships</h3>
               <ul class="checklist">
                 <li><strong>Data layer</strong> — governed UC function tools + certified metric views (catalog-parameterized, idempotent)</li>
-                <li><strong>Genie layer</strong> — curated Genie spaces from versioned <code>serialized_space</code> JSON (create-or-update, catalog remap)</li>
-                <li><strong>Supervisor</strong> — Multi-Agent Supervisor wiring the Genie spaces + Knowledge Assistant subagent + UC tools, with routing rules &amp; examples</li>
+                <li><strong>Genie layer</strong> — 4 curated Genie spaces as <strong>native <code>genie_spaces</code> DABs resources</strong>, each backed by a versioned <code>.geniespace.json</code></li>
+                <li><strong>Supervisor</strong> — managed Multi-Agent Supervisor wiring the Genie spaces + Knowledge Assistant subagent + UC tools, with routing rules &amp; examples</li>
                 <li>All <strong>tools and instructions live in the bundle</strong> — edit, commit, redeploy</li>
               </ul>
               <a href="https://github.com/VNSHANPR/ocfo-agent-platform" target="_blank" class="btn-link">View the DABs project on GitHub →</a>
+              <br><a href="docs/ocfo-agent-platform.md" target="_blank" class="btn-link">Read the CI/CD notes →</a>
             </div>
             <div class="info-block highlight">
               <h3>Promotion model (dev → preprod → prod)</h3>
               <ul class="checklist">
                 <li>Everything is <strong>catalog-parameterized</strong>; each environment sets its own <code>catalog</code></li>
-                <li>Genie JSON is the <strong>source of truth</strong> — every workspace converges on redeploy</li>
+                <li>The <code>.geniespace.json</code> files are the <strong>source of truth</strong> — every workspace converges on redeploy</li>
                 <li><code>mode: development</code> vs <code>mode: production</code> targets with per-env variables</li>
-                <li>A single job orchestrates: data layer → Genie spaces → supervisor</li>
+                <li>A single job orchestrates: data layer → supervisor (Genie spaces deploy declaratively)</li>
               </ul>
             </div>
           </div>
 
           <div class="arch-block">
-            <h3>Bundle layout</h3>
+            <h3>How the bundle works</h3>
+            <p class="card-sub" style="margin-bottom:1rem;">Under the <code>direct</code> engine, Genie spaces are a first-class DABs resource: <code>bundle deploy</code> creates them from their versioned JSON. The data layer and the managed supervisor are deployed by a job whose tasks run in order — and the supervisor step reads each Genie space's id straight from its resource via <code>${resources.genie_spaces.&lt;key&gt;.id}</code>. Requires Databricks CLI ≥ 1.16.x.</p>
             <div class="terminal-card code-terminal">
               <div class="terminal-header">
                 <span class="terminal-dot red"></span><span class="terminal-dot amber"></span><span class="terminal-dot green"></span>
                 <span class="terminal-title">ocfo-agent-platform/</span>
               </div>
               <div class="terminal-body code-body">
-<pre class="code-block">databricks.yml                       <span class="comment"># bundle · variables · dev/preprod/prod targets</span>
+<pre class="code-block">databricks.yml                       <span class="comment"># bundle (engine: direct) · vars · genie_spaces · dev/preprod/prod</span>
 config/supervisor_instructions.yml   <span class="comment"># master prompt · routing rules · agent descriptions</span>
-genie/manifest.json + genie_*.json   <span class="comment"># versioned serialized_space for each Genie space</span>
+genie/*.geniespace.json              <span class="comment"># versioned definition per Genie space (file_path)</span>
 src/deploy_data_layer.py             <span class="comment"># UC functions + metric views (idempotent)</span>
-src/deploy_genie_spaces.py           <span class="comment"># create-or-update Genie spaces, remap catalog</span>
-src/create_supervisor.py             <span class="comment"># assemble + deploy the supervisor</span>
-resources/ocfo_platform.job.yml      <span class="comment"># job: data layer → genie → supervisor</span></pre>
+src/create_supervisor.py             <span class="comment"># assemble + deploy the supervisor from config + ids</span>
+resources/ocfo_platform.job.yml      <span class="comment"># job: data layer → supervisor</span></pre>
               </div>
             </div>
+          </div>
+
+          <div class="arch-block">
+            <h3>Genie space — native DABs resource</h3>
+            <div class="terminal-card code-terminal">
+              <div class="terminal-header">
+                <span class="terminal-dot red"></span><span class="terminal-dot amber"></span><span class="terminal-dot green"></span>
+                <span class="terminal-title">databricks.yml</span>
+              </div>
+              <div class="terminal-body code-body">
+<pre class="code-block"><span class="kw">bundle</span>:
+  <span class="kw">name</span>: ocfo_agent_platform
+  <span class="kw">engine</span>: direct           <span class="comment"># required for the genie_spaces resource</span>
+
+<span class="kw">resources</span>:
+  <span class="kw">genie_spaces</span>:
+    <span class="kw">travel_expense</span>:
+      <span class="kw">title</span>: <span class="str">"Travel &amp; Expense Spend — Concur"</span>
+      <span class="kw">description</span>: <span class="str">"Employee travel &amp; expense spend, out-of-policy spend, merchants."</span>
+      <span class="kw">warehouse_id</span>: ${var.warehouse_id}
+      <span class="kw">file_path</span>: ./genie/travel_expense.geniespace.json
+      <span class="kw">permissions</span>:
+        - <span class="kw">level</span>: CAN_RUN
+          <span class="kw">group_name</span>: users</pre>
+              </div>
+            </div>
+          </div>
+
+          <div class="arch-block">
+            <h3>Supervisor config — versioned in the bundle</h3>
+            <div class="terminal-card code-terminal">
+              <div class="terminal-header">
+                <span class="terminal-dot red"></span><span class="terminal-dot amber"></span><span class="terminal-dot green"></span>
+                <span class="terminal-title">config/supervisor_instructions.yml</span>
+              </div>
+              <div class="terminal-body code-body">
+<pre class="code-block"><span class="kw">instructions</span>: |
+  <span class="comment"># master prompt + routing rules the supervisor uses</span>
+  Route each question to the single most appropriate agent...
+  Call multiple agents only when the question genuinely spans domains.
+
+<span class="kw">agents</span>:
+  - <span class="kw">name</span>: office_of_cfo          <span class="comment"># Genie subagent</span>
+    <span class="kw">kind</span>: genie
+    <span class="kw">key</span>: ocfo
+  - <span class="kw">name</span>: financial_results_docs  <span class="comment"># Knowledge Assistant subagent</span>
+    <span class="kw">kind</span>: knowledge_assistant
+    <span class="kw">key</span>: ka
+
+<span class="kw">uc_function_tools</span>:
+  - <span class="kw">name</span>: agent_tools.fx_convert
+  - <span class="kw">name</span>: agent_tools.cash_conversion_cycle</pre>
+              </div>
+            </div>
+            <p class="card-sub" style="margin-top:.75rem;"><code>create_supervisor.py</code> reads this config, resolves each Genie id from its resource (<code>${resources.genie_spaces.&lt;key&gt;.id}</code>) and the KA <code>tile_id</code>, and creates the managed Agent Bricks supervisor.</p>
           </div>
 
           <div class="arch-block">
@@ -579,7 +635,7 @@ databricks bundle deploy --target preprod &amp;&amp; databricks bundle run ocfo_
 databricks bundle deploy --target prod    &amp;&amp; databricks bundle run ocfo_agent_platform_deploy --target prod</pre>
               </div>
             </div>
-            <p class="card-sub" style="margin-top:.75rem;">No native DABs resource exists for Genie spaces, so they deploy via the versioned-JSON + <code>/api/2.0/genie/spaces</code> create-or-update pattern — fully promotable IaC.</p>
+            <p class="card-sub" style="margin-top:.75rem;">No credentials live in the bundle — auth comes from your CLI profile, and the deploy path is scoped per-user via <code>${workspace.current_user.userName}</code>.</p>
           </div>
         </section>
 
