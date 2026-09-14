@@ -1084,6 +1084,40 @@ a.db-work-tile:hover { transform: translateY(-2px); border-color: var(--accent);
   color: var(--text-secondary);
   font-size: .82rem;
 }
+.quiz-feedback.correct { color: var(--accent-green); }
+.quiz-feedback.incorrect { color: #F1948A; }
+
+/* progress bar */
+.quiz-progress {
+  height: 8px; border-radius: 999px; background: var(--bg-secondary);
+  border: 1px solid var(--border); overflow: hidden;
+}
+.quiz-progress #quiz-progress-fill {
+  display: block; height: 100%; width: 0;
+  background: linear-gradient(90deg, var(--accent-orange), var(--accent));
+  transition: width .4s ease;
+}
+
+/* result panel */
+.quiz-result {
+  margin-top: 1.5rem; padding: 1.5rem;
+  border: 1px solid var(--border); border-radius: 14px;
+  background: var(--bg-secondary); text-align: center;
+}
+.quiz-retry h3, .quiz-success h3 { font-size: 1.15rem; margin-bottom: .5rem; }
+.quiz-retry #quiz-retry-btn { margin-top: 1rem; }
+
+/* certification emblem */
+.quiz-success { animation: fadeUp .5s ease forwards; }
+.cert-badge {
+  display: flex; flex-direction: column; align-items: center; gap: 1rem;
+  margin: 1.25rem auto; max-width: 460px;
+}
+.cert-badge svg { filter: drop-shadow(0 10px 30px rgba(255,54,33,.35)); }
+.cert-caption { }
+.cert-caption strong { display: block; font-size: 1rem; color: var(--text-primary); margin-bottom: .35rem; }
+.cert-caption span { font-size: .8rem; color: var(--text-secondary); }
+.quiz-success #quiz-retry-btn2 { margin-top: .5rem; }
 
 /* ========================  CODE TERMINAL  ======================== */
 .memory-terminal-section {

@@ -735,41 +735,165 @@ AsyncDatabricksStore(
           <div class="card-header compact">
             <span class="agenda-num">07</span>
             <div>
-              <h2>Sample Quiz</h2>
-              <p class="card-sub">Built-in questions to reinforce Genie and platform best practices.</p>
+              <h2>Certification Quiz — 10 questions</h2>
+              <p class="card-sub">All 10 from the oCFO agent platform we built. Get <strong>all 10 correct</strong> to earn your (entirely unofficial) certification emblem. Miss any and you can retry.</p>
             </div>
           </div>
 
+          <div class="quiz-progress"><span id="quiz-progress-fill"></span></div>
+          <p id="quiz-progress-text" class="card-sub" style="margin:.4rem 0 1rem;">0 of 10 answered</p>
+
           <div class="quiz-list">
-            <article class="quiz-card" data-answer="b">
-              <h3>1. What is the best CI/CD gate before promoting a Genie change?</h3>
+            <article class="quiz-card" data-answer="b" data-explain="Ratio measures use SUM(x)/SUM(y) so they re-aggregate correctly at any grain — averaging a precomputed ratio would give wrong totals.">
+              <h3>1. In our metric views, why are ratios like Out-of-Policy % written as <code>SUM(x)/SUM(y)*100</code> rather than <code>AVG(precomputed_ratio)</code>?</h3>
               <div class="quiz-options">
-                <button class="quiz-option" data-choice="a">Rely on manual spot checks only</button>
-                <button class="quiz-option" data-choice="b">Run benchmark regression tests against representative questions</button>
-                <button class="quiz-option" data-choice="c">Publish first and monitor later</button>
+                <button class="quiz-option" data-choice="a">It runs faster on the warehouse</button>
+                <button class="quiz-option" data-choice="b">So the ratio re-aggregates correctly at any grouping grain</button>
+                <button class="quiz-option" data-choice="c">Because AVG isn't supported in metric views</button>
               </div>
               <p class="quiz-feedback"></p>
             </article>
 
-            <article class="quiz-card" data-answer="c">
-              <h3>2. When is a Supervisor Agent most useful?</h3>
+            <article class="quiz-card" data-answer="c" data-explain="genie_spaces is a native DABs resource only under the direct engine (bundle: engine: direct).">
+              <h3>2. Which bundle engine is required to declare Genie spaces as native <code>genie_spaces</code> DABs resources?</h3>
               <div class="quiz-options">
-                <button class="quiz-option" data-choice="a">When one table answers every question</button>
-                <button class="quiz-option" data-choice="b">When there is no need for tools or routing</button>
-                <button class="quiz-option" data-choice="c">When a question spans multiple domains, agents, or tools</button>
+                <button class="quiz-option" data-choice="a">terraform</button>
+                <button class="quiz-option" data-choice="b">serverless</button>
+                <button class="quiz-option" data-choice="c">direct</button>
               </div>
               <p class="quiz-feedback"></p>
             </article>
 
-            <article class="quiz-card" data-answer="a">
-              <h3>3. What helps a Genie space stay trustworthy for executives?</h3>
+            <article class="quiz-card" data-answer="a" data-explain="CLI v1.0.0 reports 'unknown field: genie_spaces'; we upgraded to 1.16.1. You need ≥ 1.16.x.">
+              <h3>3. What minimum Databricks CLI version recognizes the <code>genie_spaces</code> resource in our bundle?</h3>
               <div class="quiz-options">
-                <button class="quiz-option" data-choice="a">Clear semantic definitions, curated examples, and governed data</button>
-                <button class="quiz-option" data-choice="b">Large prompts without benchmark coverage</button>
-                <button class="quiz-option" data-choice="c">Using every table available regardless of relevance</button>
+                <button class="quiz-option" data-choice="a">≥ 1.16.x</button>
+                <button class="quiz-option" data-choice="b">≥ 1.0.0</button>
+                <button class="quiz-option" data-choice="c">Any version — it's always supported</button>
               </div>
               <p class="quiz-feedback"></p>
             </article>
+
+            <article class="quiz-card" data-answer="b" data-explain="The Store (AsyncDatabricksStore) holds cross-thread, namespaced key/value memory; the checkpointer is per-thread conversation state.">
+              <h3>4. In the LangGraph memory agent, which construct holds <em>cross-thread, org-wide</em> facts (not per-conversation state)?</h3>
+              <div class="quiz-options">
+                <button class="quiz-option" data-choice="a">The checkpointer (AsyncCheckpointSaver)</button>
+                <button class="quiz-option" data-choice="b">The Store (AsyncDatabricksStore)</button>
+                <button class="quiz-option" data-choice="c">The thread_id widget</button>
+              </div>
+              <p class="quiz-feedback"></p>
+            </article>
+
+            <article class="quiz-card" data-answer="c" data-explain="FCTG's fiscal year ends 30 June, so 15 Aug 2026 falls in FY27 Q1 (Jul–Sep).">
+              <h3>5. Our <code>fctg_fiscal_period()</code> tool: what does it return for <code>DATE'2026-08-15'</code> (FY ends 30 June)?</h3>
+              <div class="quiz-options">
+                <button class="quiz-option" data-choice="a">FY26 Q4</button>
+                <button class="quiz-option" data-choice="b">FY26 Q1</button>
+                <button class="quiz-option" data-choice="c">FY27 Q1</button>
+              </div>
+              <p class="quiz-feedback"></p>
+            </article>
+
+            <article class="quiz-card" data-answer="a" data-explain="Trusted = all 12 checks pass, which includes a completed optimization run and best benchmark accuracy ≥ 85%.">
+              <h3>6. In Genie Workbench, reaching the <strong>Trusted</strong> tier requires…</h3>
+              <div class="quiz-options">
+                <button class="quiz-option" data-choice="a">All 12 IQ checks, including benchmark accuracy ≥ 85%</button>
+                <button class="quiz-option" data-choice="b">Only a non-empty agent description</button>
+                <button class="quiz-option" data-choice="c">At least 250 tables attached</button>
+              </div>
+              <p class="quiz-feedback"></p>
+            </article>
+
+            <article class="quiz-card" data-answer="b" data-explain="The supervisor routes on each subagent's description — specific, non-overlapping descriptions are the highest-leverage routing fix.">
+              <h3>7. What is the single most important routing signal for each subagent in the Supervisor?</h3>
+              <div class="quiz-options">
+                <button class="quiz-option" data-choice="a">The order agents are listed</button>
+                <button class="quiz-option" data-choice="b">Each agent's description</button>
+                <button class="quiz-option" data-choice="c">The size of its underlying tables</button>
+              </div>
+              <p class="quiz-feedback"></p>
+            </article>
+
+            <article class="quiz-card" data-answer="c" data-explain="The Knowledge Assistant is wired in as a direct subagent via its ka_tile_id — no custom RAG plumbing needed.">
+              <h3>8. How is the FCTG financial-results Knowledge Assistant added to the Supervisor?</h3>
+              <div class="quiz-options">
+                <button class="quiz-option" data-choice="a">As a Lakebase synced table</button>
+                <button class="quiz-option" data-choice="b">As a metric view</button>
+                <button class="quiz-option" data-choice="c">As a direct subagent via its <code>ka_tile_id</code></button>
+              </div>
+              <p class="quiz-feedback"></p>
+            </article>
+
+            <article class="quiz-card" data-answer="c" data-explain="A supervisor subagent/tool is one of genie_space_id, ka_tile_id, endpoint_name, uc_function_name or connection_name — 'lakebase_branch' is not one.">
+              <h3>9. Which of these is <em>not</em> a valid Supervisor subagent/tool reference?</h3>
+              <div class="quiz-options">
+                <button class="quiz-option" data-choice="a"><code>genie_space_id</code></button>
+                <button class="quiz-option" data-choice="b"><code>uc_function_name</code></button>
+                <button class="quiz-option" data-choice="c"><code>lakebase_branch</code></button>
+              </div>
+              <p class="quiz-feedback"></p>
+            </article>
+
+            <article class="quiz-card" data-answer="a" data-explain="MLflow Tracing captures each turn — the routing decision, sub-agent calls, tool I/O, latency and tokens — which is what the eval/judges score.">
+              <h3>10. Which MLflow capability shows <em>why</em> the Supervisor routed as it did (routing decision, tool I/O, latency, tokens)?</h3>
+              <div class="quiz-options">
+                <button class="quiz-option" data-choice="a">MLflow Tracing</button>
+                <button class="quiz-option" data-choice="b">MLflow Model Registry</button>
+                <button class="quiz-option" data-choice="c">MLflow Feature Store</button>
+              </div>
+              <p class="quiz-feedback"></p>
+            </article>
+          </div>
+
+          <!-- Result / certification placeholder -->
+          <div id="quiz-result" class="quiz-result" hidden>
+            <!-- Retry state -->
+            <div id="quiz-retry" class="quiz-retry" hidden>
+              <h3>Almost there 🍽️</h3>
+              <p id="quiz-retry-text" class="card-sub"></p>
+              <button id="quiz-retry-btn" class="btn-glow" type="button">Retry the quiz</button>
+            </div>
+
+            <!-- Success state: certification emblem -->
+            <div id="quiz-success" class="quiz-success" hidden>
+              <h3>🎉 Congratulations — a perfect 10 / 10!</h3>
+              <p class="card-sub">You are hereby (completely unofficially) recognized as a…</p>
+
+              <div class="cert-badge" role="img" aria-label="Lakehouse Lunch and Learn Certified Associate emblem">
+                <svg viewBox="0 0 260 300" width="230" height="266" xmlns="http://www.w3.org/2000/svg">
+                  <defs>
+                    <linearGradient id="cbg" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0" stop-color="#FF6F42"/>
+                      <stop offset="1" stop-color="#FF3621"/>
+                    </linearGradient>
+                    <linearGradient id="cbg2" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0" stop-color="#1C2128"/>
+                      <stop offset="1" stop-color="#0D1117"/>
+                    </linearGradient>
+                  </defs>
+                  <!-- outer hexagon -->
+                  <polygon points="130,8 236,68 236,188 130,248 24,188 24,68" fill="url(#cbg)"/>
+                  <polygon points="130,22 224,75 224,181 130,234 36,181 36,75" fill="url(#cbg2)" stroke="#FF6F42" stroke-width="2"/>
+                  <!-- emblem mark (stylized stacked lakehouse layers — not a logo) -->
+                  <g transform="translate(130,86)" fill="#FF6F42">
+                    <rect x="-26" y="-6" width="52" height="9" rx="2"/>
+                    <rect x="-20" y="8" width="40" height="9" rx="2" fill="#FF3621"/>
+                    <rect x="-13" y="22" width="26" height="9" rx="2" fill="#FFB020"/>
+                  </g>
+                  <text x="130" y="150" text-anchor="middle" fill="#E6EDF3" font-family="DM Sans, sans-serif" font-size="17" font-weight="700">LAKEHOUSE</text>
+                  <text x="130" y="171" text-anchor="middle" fill="#E6EDF3" font-family="DM Sans, sans-serif" font-size="13" font-weight="600">LUNCH &amp; LEARN</text>
+                  <text x="130" y="196" text-anchor="middle" fill="#8B949E" font-family="JetBrains Mono, monospace" font-size="10" letter-spacing="2">CERTIFIED ASSOCIATE</text>
+                  <!-- ribbon -->
+                  <polygon points="92,244 168,244 168,292 130,272 92,292" fill="#FF3621"/>
+                  <text x="130" y="266" text-anchor="middle" fill="#fff" font-family="JetBrains Mono, monospace" font-size="13" font-weight="700">10 / 10</text>
+                </svg>
+                <div class="cert-caption">
+                  <strong>Lakehouse Lunch &amp; Learn — Certified Associate</strong>
+                  <span>Awarded for surviving 10 questions, ideally on a full stomach. Not affiliated with any real certification. 🥪</span>
+                </div>
+              </div>
+              <button id="quiz-retry-btn2" class="btn-outline" type="button">Take it again</button>
+            </div>
           </div>
         </section>
       </div>

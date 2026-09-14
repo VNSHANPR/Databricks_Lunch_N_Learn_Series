@@ -110,34 +110,91 @@ function initTerminalSimulation() {
 }
 
 function initQuiz() {
-  const explanations = {
-    1: 'Benchmark regressions are the best promotion gate because they catch quality drift before executives feel it.',
-    2: 'Supervisor Agent is strongest when it must route across multiple agents, tools, or domains rather than answer from one source.',
-    3: 'Trust comes from governed data, clear definitions, and representative examples, not from larger prompts alone.'
-  };
+  const cards = Array.from(document.querySelectorAll('.quiz-card'));
+  if (!cards.length) return;
+  const total = cards.length;
+  const fill = document.getElementById('quiz-progress-fill');
+  const progressText = document.getElementById('quiz-progress-text');
+  const result = document.getElementById('quiz-result');
+  const successEl = document.getElementById('quiz-success');
+  const retryEl = document.getElementById('quiz-retry');
+  const retryText = document.getElementById('quiz-retry-text');
 
-  document.querySelectorAll('.quiz-card').forEach((card, cardIndex) => {
+  let answered = 0;
+  let correctCount = 0;
+
+  function updateProgress() {
+    if (fill) fill.style.width = `${(answered / total) * 100}%`;
+    if (progressText) progressText.textContent = `${answered} of ${total} answered`;
+  }
+
+  function finish() {
+    if (result) result.hidden = false;
+    const perfect = correctCount === total;
+    if (successEl) successEl.hidden = !perfect;
+    if (retryEl) retryEl.hidden = perfect;
+    if (!perfect && retryText) {
+      retryText.textContent = `You got ${correctCount} of ${total} correct. The certification needs all ${total} — give it another go!`;
+    }
+    if (result) result.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+
+  function bindCard(card) {
     const correct = card.dataset.answer;
+    const explain = card.dataset.explain || '';
     const feedback = card.querySelector('.quiz-feedback');
     const options = card.querySelectorAll('.quiz-option');
 
     options.forEach(option => {
       option.addEventListener('click', () => {
+        if (card.dataset.done === 'true') return;
+        card.dataset.done = 'true';
         const choice = option.dataset.choice;
         options.forEach(btn => btn.classList.add('disabled'));
 
         if (choice === correct) {
           option.classList.add('correct');
-          feedback.textContent = `Correct. ${explanations[cardIndex + 1]}`;
+          feedback.className = 'quiz-feedback correct';
+          feedback.textContent = `Correct. ${explain}`;
+          correctCount += 1;
         } else {
           option.classList.add('incorrect');
           const correctOption = card.querySelector(`.quiz-option[data-choice="${correct}"]`);
           if (correctOption) correctOption.classList.add('correct');
-          feedback.textContent = `Not quite. ${explanations[cardIndex + 1]}`;
+          feedback.className = 'quiz-feedback incorrect';
+          feedback.textContent = `Not quite. ${explain}`;
         }
+
+        answered += 1;
+        updateProgress();
+        if (answered === total) finish();
       });
     });
+  }
+
+  function reset() {
+    answered = 0;
+    correctCount = 0;
+    cards.forEach(card => {
+      card.dataset.done = 'false';
+      const feedback = card.querySelector('.quiz-feedback');
+      if (feedback) { feedback.textContent = ''; feedback.className = 'quiz-feedback'; }
+      card.querySelectorAll('.quiz-option').forEach(btn =>
+        btn.classList.remove('disabled', 'correct', 'incorrect'));
+    });
+    if (result) result.hidden = true;
+    if (successEl) successEl.hidden = true;
+    if (retryEl) retryEl.hidden = true;
+    updateProgress();
+    cards[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+
+  cards.forEach(bindCard);
+  ['quiz-retry-btn', 'quiz-retry-btn2'].forEach(id => {
+    const b = document.getElementById(id);
+    if (b) b.addEventListener('click', reset);
   });
+  updateProgress();
 }
 
 function initScrollAnimations() {
