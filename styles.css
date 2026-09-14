@@ -1003,6 +1003,19 @@ a.db-work-tile:hover { transform: translateY(-2px); border-color: var(--accent);
   border-top: 1px solid var(--border);
 }
 .arch-figure figcaption a { color: var(--accent); }
+
+/* architecture placeholder (diagram coming later) */
+.arch-placeholder {
+  border: 2px dashed var(--border);
+  border-radius: 14px;
+  padding: 3rem 2rem;
+  text-align: center;
+  background: var(--bg-secondary);
+  color: var(--text-secondary);
+}
+.arch-placeholder-icon { font-size: 2.6rem; display: block; margin-bottom: .5rem; }
+.arch-placeholder p { margin: .2rem 0; }
+.arch-placeholder strong { color: var(--text-primary); }
 @media (max-width: 900px) { .arch-scene { height: 440px; } }
 
 @media (max-width: 900px) {

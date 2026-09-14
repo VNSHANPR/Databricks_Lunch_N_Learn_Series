@@ -82,6 +82,7 @@
       <div class="content-card tabs-card">
         <div class="agenda-tabs" role="tablist" aria-label="Agenda tabs">
           <button class="agenda-tab active" data-tab="tab-roadmap" role="tab" aria-selected="true">Roadmap</button>
+          <button class="agenda-tab" data-tab="tab-scenario" role="tab" aria-selected="false">Scenario</button>
           <button class="agenda-tab" data-tab="tab-genie" role="tab" aria-selected="false">Genie</button>
           <button class="agenda-tab" data-tab="tab-tools" role="tab" aria-selected="false">Tools</button>
           <button class="agenda-tab" data-tab="tab-supervisor" role="tab" aria-selected="false">Supervisor Agent</button>
@@ -111,10 +112,80 @@
           </div>
         </section>
 
+        <!-- ═══════════════  SCENARIO  ═══════════════ -->
+        <section id="tab-scenario" class="tab-panel" role="tabpanel">
+          <div class="card-header compact">
+            <span class="agenda-num">02</span>
+            <div>
+              <h2>Scenario — the oCFO Agent Platform</h2>
+              <p class="card-sub">A worked, end-to-end scenario for Flight Centre Travel Group: one governed entry point that answers finance, workforce, spend and supplier questions across systems.</p>
+            </div>
+          </div>
+
+          <div class="info-block" style="margin-bottom:1.25rem;">
+            <h3>The story</h3>
+            <p>Flight Centre's Office of the CFO wants leaders to ask questions in plain language — "what's our FY26 take rate?", "attrition by department?", "how much travel spend is out of policy?", "which suppliers are due for renewal?", "what did the annual report say about capital allocation?" — and get governed, trustworthy answers without knowing which system or dataset holds the truth. We build that as a <strong>Multi-Agent Supervisor</strong> over specialised Genie agents, a document Knowledge Assistant, and governed calculation tools, all on the Databricks Data Intelligence Platform.</p>
+          </div>
+
+          <div class="two-col">
+            <div class="info-block">
+              <h3>Source systems &amp; domains</h3>
+              <ul class="checklist">
+                <li><strong>Office of the CFO</strong> — group P&amp;L, TTV, revenue, margin, working capital (DSO/DPO/DIO/CCC), FX, regional performance</li>
+                <li><strong>Workday</strong> — headcount, hiring, attrition, tenure, compensation</li>
+                <li><strong>SAP Concur</strong> — employee travel &amp; expense spend, out-of-policy, merchants</li>
+                <li><strong>SAP Ariba</strong> — supplier spend, savings, risk, contract renewals</li>
+                <li><strong>Financial-results documents</strong> — annual &amp; half-year results, trading updates, capital &amp; liquidity (PDFs)</li>
+              </ul>
+            </div>
+            <div class="info-block highlight">
+              <h3>What we build</h3>
+              <ul class="checklist">
+                <li><strong>Certified metric views</strong> on each domain's KPIs (one governed definition)</li>
+                <li><strong>4 curated Genie agents</strong> (oCFO, HR, Travel, Supplier) with benchmark questions</li>
+                <li><strong>Knowledge Assistant</strong> over the results PDFs — the documents subagent</li>
+                <li><strong>UC function tools</strong> (FX convert, cash-conversion-cycle, fiscal period, % change)</li>
+                <li><strong>Supervisor Agent</strong> routing across all of the above, governed by Unity Catalog &amp; Unity AI Gateway</li>
+                <li>Shipped dev→preprod→prod via a <strong>Declarative Automation Bundle</strong>, with <strong>MLflow tracing &amp; evaluation</strong></li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="two-col">
+            <div class="info-block">
+              <h3>How a question flows</h3>
+              <ul class="checklist">
+                <li>A user asks the <strong>Supervisor</strong> a natural-language question</li>
+                <li>The Supervisor routes to the right subagent from its <em>description</em> (Genie space, Knowledge Assistant, or tool)</li>
+                <li>Genie agents query <strong>certified metric views</strong>; the KA retrieves from the results PDFs; tools compute derived values</li>
+                <li>The answer is composed and returned, noting which domains contributed — every step traced in <strong>MLflow</strong></li>
+              </ul>
+            </div>
+            <div class="info-block">
+              <h3>Why it matters</h3>
+              <ul class="checklist">
+                <li>One governed front door instead of four disconnected systems</li>
+                <li>Consistent KPIs — metric views mean everyone gets the same number</li>
+                <li>Least-privilege access; users only reach data they're permitted to</li>
+                <li>Quality is measurable (benchmarks + judges) and promotable (CI/CD)</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="arch-block">
+            <h3>Reference architecture</h3>
+            <div class="arch-placeholder">
+              <span class="arch-placeholder-icon">🏗️</span>
+              <p><strong>Architecture diagram coming soon</strong></p>
+              <p class="card-sub">A detailed end-to-end diagram of the oCFO Agent Platform will be added here.</p>
+            </div>
+          </div>
+        </section>
+
         <!-- ═══════════════  GENIE  ═══════════════ -->
         <section id="tab-genie" class="tab-panel" role="tabpanel">
           <div class="card-header compact">
-            <span class="agenda-num">02</span>
+            <span class="agenda-num">03</span>
             <div>
               <h2>Genie — Best Practices</h2>
               <p class="card-sub">Build, curate and tune high-quality Genie agents grounded in governed data.</p>
@@ -227,7 +298,7 @@
         <!-- ═══════════════  TOOLS  ═══════════════ -->
         <section id="tab-tools" class="tab-panel" role="tabpanel">
           <div class="card-header compact">
-            <span class="agenda-num">03</span>
+            <span class="agenda-num">04</span>
             <div>
               <h2>Tools</h2>
               <p class="card-sub">Assets that assess, tune, trace and evaluate your Genie and Supervisor agents.</p>
@@ -341,20 +412,11 @@
         <!-- ═══════════════  SUPERVISOR AGENT  ═══════════════ -->
         <section id="tab-supervisor" class="tab-panel" role="tabpanel">
           <div class="card-header compact">
-            <span class="agenda-num">04</span>
+            <span class="agenda-num">05</span>
             <div>
               <h2>Supervisor Agent</h2>
               <p class="card-sub">Orchestrate multiple Genie agents, Knowledge Assistants and tools behind one entry point — with reliable routing, governance and evaluation.</p>
             </div>
-          </div>
-
-          <div class="arch-block">
-            <h3>Reference architecture — oCFO Agent Platform</h3>
-            <p class="card-sub" style="margin-bottom:1rem;">End-to-end: source systems (Workday, Concur, Ariba, Finance) → Lakeflow ingestion → medallion + Lakehouse/Lakebase → certified metric views &amp; Genie Ontology → Genie agents, Knowledge Assistant and Supervisor, all governed by Unity Catalog &amp; Unity AI Gateway.</p>
-            <div class="arch-figure" style="overflow-x:auto;">
-              <img src="assets/ocfo-architecture.svg" loading="lazy" alt="oCFO Agent Platform architecture: Workday, Concur, Ariba and Finance sources ingested via Lakeflow Connect / Auto Loader / Zerobus into a Bronze/Silver/Gold medallion; served through Lakehouse and Lakebase with certified metric views and Genie Ontology; consumed by domain Genie agents, a Knowledge Assistant over financial-results PDFs, and a Supervisor Agent, with Unity Catalog and Unity AI Gateway governing across Data + AI." style="min-width:1100px; width:2231px; max-width:none;">
-            </div>
-            <figcaption class="card-sub" style="margin-top:.6rem;">Scroll horizontally to see the full flow. <a href="assets/ocfo-architecture.svg" target="_blank" rel="noopener" class="btn-link">Open full size →</a></figcaption>
           </div>
 
           <div class="two-col">
@@ -522,7 +584,7 @@
         <!-- ═══════════════  CI/CD  ═══════════════ -->
         <section id="tab-cicd" class="tab-panel" role="tabpanel">
           <div class="card-header compact">
-            <span class="agenda-num">05</span>
+            <span class="agenda-num">06</span>
             <div>
               <h2>CI/CD — ship the whole agent stack as code</h2>
               <p class="card-sub">One consolidated Declarative Automation Bundle (DABs) that promotes the entire oCFO agent platform across dev → preprod → prod workspaces.</p>
@@ -650,7 +712,7 @@ databricks bundle deploy --target prod    &amp;&amp; databricks bundle run ocfo_
 
         <section id="tab-memory" class="tab-panel" role="tabpanel">
           <div class="card-header compact">
-            <span class="agenda-num">06</span>
+            <span class="agenda-num">07</span>
             <div>
               <h2>Agent Memory</h2>
               <p class="card-sub">Give your agents persistence — short-term session state and long-term semantic recall, powered by Lakebase.</p>
@@ -742,7 +804,7 @@ AsyncDatabricksStore(
 
         <section id="tab-quiz" class="tab-panel" role="tabpanel">
           <div class="card-header compact">
-            <span class="agenda-num">07</span>
+            <span class="agenda-num">08</span>
             <div>
               <h2>Certification Quiz — 10 questions</h2>
               <p class="card-sub">All 10 from the oCFO agent platform we built. Get <strong>all 10 correct</strong> to earn your (entirely unofficial) certification emblem. Miss any and you can retry.</p>
