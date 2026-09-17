@@ -174,11 +174,11 @@
 
           <div class="arch-block">
             <h3>Reference architecture</h3>
-            <div class="arch-placeholder">
-              <span class="arch-placeholder-icon">🏗️</span>
-              <p><strong>Architecture diagram coming soon</strong></p>
-              <p class="card-sub">A detailed end-to-end diagram of the oCFO Agent Platform will be added here.</p>
+            <p class="card-sub" style="margin-bottom:1rem;">End-to-end: source systems (Workday, Concur, Ariba, Finance) → Lakeflow ingestion → medallion + Lakehouse/Lakebase → certified metric views &amp; Genie Ontology → Genie agents, Knowledge Assistant and Supervisor, all governed by Unity Catalog &amp; Unity AI Gateway.</p>
+            <div class="arch-figure" style="overflow-x:auto;">
+              <img src="assets/ocfo-architecture.svg" loading="lazy" alt="oCFO Agent Platform architecture: Workday, Concur, Ariba and Finance sources ingested via Lakeflow Connect / Auto Loader / Zerobus into a Bronze/Silver/Gold medallion; served through Lakehouse and Lakebase with certified metric views and Genie Ontology; consumed by domain Genie agents, a Knowledge Assistant over financial-results PDFs, and a Supervisor Agent, with Unity Catalog and Unity AI Gateway governing across Data + AI." style="min-width:1100px; width:2231px; max-width:none;">
             </div>
+            <figcaption class="card-sub" style="margin-top:.6rem;">Scroll horizontally to see the full flow. <a href="assets/ocfo-architecture.svg" target="_blank" rel="noopener" class="btn-link">Open full size →</a></figcaption>
           </div>
         </section>
 
