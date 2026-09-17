@@ -627,7 +627,7 @@
 config/supervisor_instructions.yml   <span class="comment"># master prompt · routing rules · agent descriptions</span>
 genie/*.geniespace.json              <span class="comment"># versioned definition per Genie space (file_path)</span>
 src/deploy_data_layer.py             <span class="comment"># UC functions + metric views (idempotent)</span>
-src/create_supervisor.py             <span class="comment"># assemble + deploy the supervisor from config + ids</span>
+src/create_supervisor.py             <span class="comment"># create + attach supervisor via /api/2.1 REST</span>
 resources/ocfo_platform.job.yml      <span class="comment"># job: data layer → create+attach supervisor (REST)</span>
 terraform/                           <span class="comment"># databricks_supervisor_agent (supervisor lifecycle as code)</span></pre>
               </div>
@@ -691,7 +691,35 @@ terraform/                           <span class="comment"># databricks_supervis
 
           <div class="arch-block">
             <h3>Supervisor lifecycle — REST (primary) &amp; Terraform (alternative)</h3>
-            <p class="card-sub" style="margin-bottom:1rem;">The deploy job creates the supervisor and attaches its sub-agents/tools via the Agent Bricks <strong>REST API</strong> (<code>/api/2.1/supervisor-agents</code>). For teams that prefer a declarative shell, the <code>terraform/</code> module manages the supervisor + instructions with <code>databricks_supervisor_agent</code> and exports the serving endpoint + MLflow experiment id for the Phase-7 eval gate — but the Terraform resource can't attach sub-agents yet, so the REST path is what wires in the Genie spaces, KA and tools.</p>
+            <p class="card-sub" style="margin-bottom:1rem;">The deploy job creates the supervisor and attaches its sub-agents/tools via the Agent Bricks <strong>REST API</strong> (<code>/api/2.1/supervisor-agents</code>) — this is how the Genie spaces, Knowledge Assistant and UC-function tools are wired in. For teams that prefer a declarative shell, the <code>terraform/</code> module manages the supervisor + instructions with <code>databricks_supervisor_agent</code> and exports the serving endpoint + MLflow experiment id for the Phase-7 eval gate — but the Terraform resource can't attach sub-agents yet, so the REST path does the attachment.</p>
+            <div class="terminal-card code-terminal">
+              <div class="terminal-header">
+                <span class="terminal-dot red"></span><span class="terminal-dot amber"></span><span class="terminal-dot green"></span>
+                <span class="terminal-title">create_supervisor.py — Agent Bricks REST API</span>
+              </div>
+              <div class="terminal-body code-body">
+<pre class="code-block"><span class="kw">from</span> <span class="mod">databricks.sdk</span> <span class="kw">import</span> WorkspaceClient
+w = WorkspaceClient()
+
+<span class="comment"># 1) create the supervisor (fields at top level)</span>
+sup = w.api_client.do(<span class="str">"POST"</span>, <span class="str">"/api/2.1/supervisor-agents"</span>, body={
+    <span class="str">"display_name"</span>: <span class="str">"oCFO Enterprise Supervisor"</span>,
+    <span class="str">"instructions"</span>: instructions,   <span class="comment"># versioned routing policy</span>
+})
+sid = sup[<span class="str">"supervisor_agent_id"</span>]
+
+<span class="comment"># 2) attach each sub-agent / tool</span>
+<span class="kw">for</span> tool_id, tool <span class="kw">in</span> tools:            <span class="comment"># genie_space | knowledge_assistant | uc_function</span>
+    w.api_client.do(<span class="str">"POST"</span>, <span class="str">f"/api/2.1/supervisor-agents/{sid}/tools"</span>,
+                    query={<span class="str">"tool_id"</span>: tool_id}, body=tool)
+
+<span class="comment"># tool examples:</span>
+<span class="comment"># {"tool_type":"genie_space",         "genie_space":{"id": genie_id}}</span>
+<span class="comment"># {"tool_type":"knowledge_assistant", "knowledge_assistant":{"knowledge_assistant_id": ka_id}}</span>
+<span class="comment"># {"tool_type":"uc_function",         "uc_function":{"name":"catalog.agent_tools.fx_convert"}}</span></pre>
+              </div>
+            </div>
+            <p class="card-sub" style="margin:.75rem 0 1rem;">Idempotent — reuses the supervisor by <code>display_name</code> and only attaches missing tools. Alternative (declarative shell):</p>
             <div class="terminal-card code-terminal">
               <div class="terminal-header">
                 <span class="terminal-dot red"></span><span class="terminal-dot amber"></span><span class="terminal-dot green"></span>
@@ -726,7 +754,7 @@ databricks bundle run ocfo_agent_platform_deploy --target dev
 <span class="comment">#    optional — manage the supervisor shell declaratively instead:</span>
 <span class="comment"># cd terraform &amp;&amp; terraform init &amp;&amp; terraform apply</span>
 
-<span class="comment"># 3) quality gate: MLflow eval against terraform output "endpoint_name"</span>
+<span class="comment"># 3) quality gate: MLflow eval against the supervisor serving endpoint (mas-*-endpoint)</span>
 
 <span class="comment"># promote the same code to preprod, then prod (repeat 1-3 per target)</span>
 databricks bundle deploy --target prod &amp;&amp; databricks bundle run ocfo_agent_platform_deploy --target prod</pre>
