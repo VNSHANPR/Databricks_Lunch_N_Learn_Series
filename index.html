@@ -609,14 +609,14 @@
                 <li>Everything is <strong>catalog-parameterized</strong>; each environment sets its own <code>catalog</code></li>
                 <li>The <code>.geniespace.json</code> files are the <strong>source of truth</strong> — every workspace converges on redeploy</li>
                 <li><code>mode: development</code> vs <code>mode: production</code> targets with per-env variables</li>
-                <li>A single job orchestrates: data layer → supervisor (Genie spaces deploy declaratively)</li>
+                <li>Genie spaces deploy declaratively (<code>bundle deploy</code>); a job builds the data layer; <strong>Terraform</strong> manages the supervisor</li>
               </ul>
             </div>
           </div>
 
           <div class="arch-block">
             <h3>How the bundle works</h3>
-            <p class="card-sub" style="margin-bottom:1rem;">Under the <code>direct</code> engine, Genie spaces are a first-class DABs resource: <code>bundle deploy</code> creates them from their versioned JSON. The data layer and the managed supervisor are deployed by a job whose tasks run in order — and the supervisor step reads each Genie space's id straight from its resource via <code>${resources.genie_spaces.&lt;key&gt;.id}</code>. Requires Databricks CLI ≥ 1.16.x.</p>
+            <p class="card-sub" style="margin-bottom:1rem;">Under the <code>direct</code> engine, Genie spaces are a first-class DABs resource: <code>bundle deploy</code> creates them from their versioned JSON. A DABs job then builds the data layer and <em>assembles</em> the supervisor spec (reading each Genie space's id via <code>${resources.genie_spaces.&lt;key&gt;.id}</code>); the <strong>managed Supervisor itself is created by Terraform</strong> (<code>databricks_supervisor_agent</code>), since DABs has no resource for it. Requires Databricks CLI ≥ 1.16.x.</p>
             <div class="terminal-card code-terminal">
               <div class="terminal-header">
                 <span class="terminal-dot red"></span><span class="terminal-dot amber"></span><span class="terminal-dot green"></span>
