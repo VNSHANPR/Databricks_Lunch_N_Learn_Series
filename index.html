@@ -597,7 +597,7 @@
               <ul class="checklist">
                 <li><strong>Data layer</strong> — governed UC function tools + certified metric views (catalog-parameterized, idempotent)</li>
                 <li><strong>Genie layer</strong> — 4 curated Genie spaces as <strong>native <code>genie_spaces</code> DABs resources</strong>, each backed by a versioned <code>.geniespace.json</code></li>
-                <li><strong>Supervisor</strong> — managed Multi-Agent Supervisor over the Genie spaces + Knowledge Assistant + UC tools, managed as code via a <code>databricks_supervisor_agent</code> Terraform resource</li>
+                <li><strong>Supervisor</strong> — managed Multi-Agent Supervisor over the Genie spaces + Knowledge Assistant + UC tools, <strong>created &amp; attached via the Agent Bricks REST API</strong> in the deploy job (Terraform alternative for the shell)</li>
                 <li>All <strong>tools and instructions live in the bundle</strong> — edit, commit, redeploy</li>
               </ul>
               <a href="https://github.com/VNSHANPR/ocfo-agent-platform" target="_blank" class="btn-link">View the DABs project on GitHub →</a>
@@ -609,14 +609,14 @@
                 <li>Everything is <strong>catalog-parameterized</strong>; each environment sets its own <code>catalog</code></li>
                 <li>The <code>.geniespace.json</code> files are the <strong>source of truth</strong> — every workspace converges on redeploy</li>
                 <li><code>mode: development</code> vs <code>mode: production</code> targets with per-env variables</li>
-                <li>Genie spaces deploy declaratively (<code>bundle deploy</code>); a job builds the data layer; <strong>Terraform</strong> manages the supervisor</li>
+                <li>Genie spaces deploy declaratively (<code>bundle deploy</code>); a job builds the data layer and <strong>creates + attaches the supervisor via REST</strong></li>
               </ul>
             </div>
           </div>
 
           <div class="arch-block">
             <h3>How the bundle works</h3>
-            <p class="card-sub" style="margin-bottom:1rem;">Under the <code>direct</code> engine, Genie spaces are a first-class DABs resource: <code>bundle deploy</code> creates them from their versioned JSON. A DABs job then builds the data layer and <em>assembles</em> the supervisor spec (reading each Genie space's id via <code>${resources.genie_spaces.&lt;key&gt;.id}</code>); the <strong>managed Supervisor itself is created by Terraform</strong> (<code>databricks_supervisor_agent</code>), since DABs has no resource for it. Requires Databricks CLI ≥ 1.16.x.</p>
+            <p class="card-sub" style="margin-bottom:1rem;">Under the <code>direct</code> engine, Genie spaces are a first-class DABs resource: <code>bundle deploy</code> creates them from their versioned JSON. A DABs job then builds the data layer and <strong>creates the supervisor + attaches its sub-agents/tools via the Agent Bricks REST API</strong> (<code>POST /api/2.1/supervisor-agents</code> and <code>.../{id}/tools</code>), reading each Genie space's id via <code>${resources.genie_spaces.&lt;key&gt;.id}</code>. Requires Databricks CLI ≥ 1.16.x.</p>
             <div class="terminal-card code-terminal">
               <div class="terminal-header">
                 <span class="terminal-dot red"></span><span class="terminal-dot amber"></span><span class="terminal-dot green"></span>
@@ -628,7 +628,7 @@ config/supervisor_instructions.yml   <span class="comment"># master prompt · ro
 genie/*.geniespace.json              <span class="comment"># versioned definition per Genie space (file_path)</span>
 src/deploy_data_layer.py             <span class="comment"># UC functions + metric views (idempotent)</span>
 src/create_supervisor.py             <span class="comment"># assemble + deploy the supervisor from config + ids</span>
-resources/ocfo_platform.job.yml      <span class="comment"># job: data layer → supervisor spec</span>
+resources/ocfo_platform.job.yml      <span class="comment"># job: data layer → create+attach supervisor (REST)</span>
 terraform/                           <span class="comment"># databricks_supervisor_agent (supervisor lifecycle as code)</span></pre>
               </div>
             </div>
@@ -686,12 +686,12 @@ terraform/                           <span class="comment"># databricks_supervis
   - <span class="kw">name</span>: agent_tools.cash_conversion_cycle</pre>
               </div>
             </div>
-            <p class="card-sub" style="margin-top:.75rem;"><code>create_supervisor.py</code> reads this config and resolves each Genie id (<code>${resources.genie_spaces.&lt;key&gt;.id}</code>) and the KA <code>tile_id</code> into the supervisor spec.</p>
+            <p class="card-sub" style="margin-top:.75rem;"><code>create_supervisor.py</code> reads this config, resolves each Genie id and the KA <code>tile_id</code>, then <strong>creates the supervisor and attaches every sub-agent/tool via <code>POST /api/2.1/supervisor-agents</code> + <code>.../{id}/tools</code></strong> (idempotent).</p>
           </div>
 
           <div class="arch-block">
-            <h3>Supervisor lifecycle — Terraform</h3>
-            <p class="card-sub" style="margin-bottom:1rem;">DABs has no resource for the Agent Bricks Multi-Agent Supervisor, so its lifecycle is managed as code with the <code>databricks_supervisor_agent</code> Terraform resource — run <em>after</em> the bundle. It version-controls the supervisor &amp; routing instructions and exports the serving endpoint + MLflow experiment id (which feed the Phase-7 eval gate).</p>
+            <h3>Supervisor lifecycle — REST (primary) &amp; Terraform (alternative)</h3>
+            <p class="card-sub" style="margin-bottom:1rem;">The deploy job creates the supervisor and attaches its sub-agents/tools via the Agent Bricks <strong>REST API</strong> (<code>/api/2.1/supervisor-agents</code>). For teams that prefer a declarative shell, the <code>terraform/</code> module manages the supervisor + instructions with <code>databricks_supervisor_agent</code> and exports the serving endpoint + MLflow experiment id for the Phase-7 eval gate — but the Terraform resource can't attach sub-agents yet, so the REST path is what wires in the Genie spaces, KA and tools.</p>
             <div class="terminal-card code-terminal">
               <div class="terminal-header">
                 <span class="terminal-dot red"></span><span class="terminal-dot amber"></span><span class="terminal-dot green"></span>
@@ -706,7 +706,7 @@ terraform/                           <span class="comment"># databricks_supervis
 <span class="comment"># exports: endpoint_name, experiment_id, supervisor_agent_id  → feed the eval notebook</span></pre>
               </div>
             </div>
-            <p class="card-sub" style="margin-top:.75rem;">The pipeline is <strong>DABs → Terraform → eval gate</strong>: <code>bundle deploy/run</code> builds the data layer + Genie spaces + tools, then <code>terraform apply</code> manages the supervisor. <em>Provider note:</em> the resource manages the supervisor + instructions today; sub-agent/tool attachment (Genie spaces, KA, UC functions) is done via the Agent Bricks UI/SDK until the provider exposes subagent blocks — their ids are version-controlled in the Terraform vars, ready to wire in.</p>
+            <p class="card-sub" style="margin-top:.75rem;">The pipeline is <strong>DABs → eval gate</strong>: <code>bundle deploy</code> creates the Genie spaces, then <code>bundle run</code> builds the data layer and <strong>creates + attaches the supervisor via REST</strong>. The Terraform module is an alternative for managing the supervisor shell declaratively; sub-agent attachment stays on the REST path (<code>.../{id}/tools</code>) until the provider adds subagent blocks.</p>
           </div>
 
           <div class="arch-block">
@@ -722,8 +722,9 @@ databricks bundle validate --target dev
 databricks bundle deploy   --target dev
 databricks bundle run ocfo_agent_platform_deploy --target dev
 
-<span class="comment"># 2) supervisor lifecycle (Terraform)</span>
-cd terraform &amp;&amp; terraform init &amp;&amp; terraform apply
+<span class="comment"># 2) bundle run (above) already created + attached the supervisor via REST</span>
+<span class="comment">#    optional — manage the supervisor shell declaratively instead:</span>
+<span class="comment"># cd terraform &amp;&amp; terraform init &amp;&amp; terraform apply</span>
 
 <span class="comment"># 3) quality gate: MLflow eval against terraform output "endpoint_name"</span>
 
