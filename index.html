@@ -597,7 +597,7 @@
               <ul class="checklist">
                 <li><strong>Data layer</strong> — governed UC function tools + certified metric views (catalog-parameterized, idempotent)</li>
                 <li><strong>Genie layer</strong> — 4 curated Genie spaces as <strong>native <code>genie_spaces</code> DABs resources</strong>, each backed by a versioned <code>.geniespace.json</code></li>
-                <li><strong>Supervisor</strong> — managed Multi-Agent Supervisor wiring the Genie spaces + Knowledge Assistant subagent + UC tools, with routing rules &amp; examples</li>
+                <li><strong>Supervisor</strong> — managed Multi-Agent Supervisor over the Genie spaces + Knowledge Assistant + UC tools, managed as code via a <code>databricks_supervisor_agent</code> Terraform resource</li>
                 <li>All <strong>tools and instructions live in the bundle</strong> — edit, commit, redeploy</li>
               </ul>
               <a href="https://github.com/VNSHANPR/ocfo-agent-platform" target="_blank" class="btn-link">View the DABs project on GitHub →</a>
@@ -628,7 +628,8 @@ config/supervisor_instructions.yml   <span class="comment"># master prompt · ro
 genie/*.geniespace.json              <span class="comment"># versioned definition per Genie space (file_path)</span>
 src/deploy_data_layer.py             <span class="comment"># UC functions + metric views (idempotent)</span>
 src/create_supervisor.py             <span class="comment"># assemble + deploy the supervisor from config + ids</span>
-resources/ocfo_platform.job.yml      <span class="comment"># job: data layer → supervisor</span></pre>
+resources/ocfo_platform.job.yml      <span class="comment"># job: data layer → supervisor spec</span>
+terraform/                           <span class="comment"># databricks_supervisor_agent (supervisor lifecycle as code)</span></pre>
               </div>
             </div>
           </div>
@@ -685,7 +686,27 @@ resources/ocfo_platform.job.yml      <span class="comment"># job: data layer →
   - <span class="kw">name</span>: agent_tools.cash_conversion_cycle</pre>
               </div>
             </div>
-            <p class="card-sub" style="margin-top:.75rem;"><code>create_supervisor.py</code> reads this config, resolves each Genie id from its resource (<code>${resources.genie_spaces.&lt;key&gt;.id}</code>) and the KA <code>tile_id</code>, and creates the managed Agent Bricks supervisor.</p>
+            <p class="card-sub" style="margin-top:.75rem;"><code>create_supervisor.py</code> reads this config and resolves each Genie id (<code>${resources.genie_spaces.&lt;key&gt;.id}</code>) and the KA <code>tile_id</code> into the supervisor spec.</p>
+          </div>
+
+          <div class="arch-block">
+            <h3>Supervisor lifecycle — Terraform</h3>
+            <p class="card-sub" style="margin-bottom:1rem;">DABs has no resource for the Agent Bricks Multi-Agent Supervisor, so its lifecycle is managed as code with the <code>databricks_supervisor_agent</code> Terraform resource — run <em>after</em> the bundle. It version-controls the supervisor &amp; routing instructions and exports the serving endpoint + MLflow experiment id (which feed the Phase-7 eval gate).</p>
+            <div class="terminal-card code-terminal">
+              <div class="terminal-header">
+                <span class="terminal-dot red"></span><span class="terminal-dot amber"></span><span class="terminal-dot green"></span>
+                <span class="terminal-title">terraform/main.tf</span>
+              </div>
+              <div class="terminal-body code-body">
+<pre class="code-block"><span class="kw">resource</span> <span class="str">"databricks_supervisor_agent"</span> <span class="str">"ocfo"</span> {
+  <span class="kw">display_name</span> = <span class="str">"oCFO Enterprise Supervisor"</span>
+  <span class="kw">description</span>  = <span class="str">"Routes across oCFO, HR, Travel &amp; Supplier Genie agents + KA + UC tools."</span>
+  <span class="kw">instructions</span> = <span class="kw">local</span>.instructions   <span class="comment"># versioned routing policy</span>
+}
+<span class="comment"># exports: endpoint_name, experiment_id, supervisor_agent_id  → feed the eval notebook</span></pre>
+              </div>
+            </div>
+            <p class="card-sub" style="margin-top:.75rem;">The pipeline is <strong>DABs → Terraform → eval gate</strong>: <code>bundle deploy/run</code> builds the data layer + Genie spaces + tools, then <code>terraform apply</code> manages the supervisor. <em>Provider note:</em> the resource manages the supervisor + instructions today; sub-agent/tool attachment (Genie spaces, KA, UC functions) is done via the Agent Bricks UI/SDK until the provider exposes subagent blocks — their ids are version-controlled in the Terraform vars, ready to wire in.</p>
           </div>
 
           <div class="arch-block">
@@ -696,14 +717,18 @@ resources/ocfo_platform.job.yml      <span class="comment"># job: data layer →
                 <span class="terminal-title">promote.sh</span>
               </div>
               <div class="terminal-body code-body">
-<pre class="code-block"><span class="comment"># dev</span>
+<pre class="code-block"><span class="comment"># 1) data layer + Genie spaces + tools (DABs)</span>
 databricks bundle validate --target dev
 databricks bundle deploy   --target dev
 databricks bundle run ocfo_agent_platform_deploy --target dev
 
-<span class="comment"># promote the same code to preprod, then prod</span>
-databricks bundle deploy --target preprod &amp;&amp; databricks bundle run ocfo_agent_platform_deploy --target preprod
-databricks bundle deploy --target prod    &amp;&amp; databricks bundle run ocfo_agent_platform_deploy --target prod</pre>
+<span class="comment"># 2) supervisor lifecycle (Terraform)</span>
+cd terraform &amp;&amp; terraform init &amp;&amp; terraform apply
+
+<span class="comment"># 3) quality gate: MLflow eval against terraform output "endpoint_name"</span>
+
+<span class="comment"># promote the same code to preprod, then prod (repeat 1-3 per target)</span>
+databricks bundle deploy --target prod &amp;&amp; databricks bundle run ocfo_agent_platform_deploy --target prod</pre>
               </div>
             </div>
             <p class="card-sub" style="margin-top:.75rem;">No credentials live in the bundle — auth comes from your CLI profile, and the deploy path is scoped per-user via <code>${workspace.current_user.userName}</code>.</p>

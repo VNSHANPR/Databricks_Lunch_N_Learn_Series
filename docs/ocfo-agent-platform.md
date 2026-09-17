@@ -61,6 +61,20 @@ uc_function_tools:
   - name: agent_tools.fx_convert
 ```
 
+
+## Supervisor lifecycle — Terraform
+
+DABs has no resource for the Agent Bricks Multi-Agent Supervisor, so it's managed as code
+with the `databricks_supervisor_agent` Terraform resource (in `terraform/`), run **after**
+the bundle. It version-controls the supervisor + routing instructions and exports
+`endpoint_name` + `experiment_id` (which feed the Phase-7 MLflow eval gate).
+
+Pipeline per environment: **DABs (`bundle deploy`+`run`) → Terraform (`apply`) → MLflow eval gate.**
+
+> Provider note: the resource manages the supervisor + instructions today; sub-agent/tool
+> attachment (Genie spaces, KA, UC functions) is done via the Agent Bricks UI/SDK until the
+> provider exposes subagent blocks — their ids are version-controlled in the Terraform vars.
+
 ## Requirements
 
 - **Databricks CLI ≥ 1.16.x** (older CLIs don't recognize `genie_spaces`).
