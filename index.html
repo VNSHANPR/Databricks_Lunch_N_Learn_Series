@@ -28,14 +28,14 @@
 
     <div class="sidebar-section-title">Sessions</div>
     <ul class="session-list">
-      <li class="session-item active" data-session="session-20260917">
-        <span class="session-date">17 Sep 2026</span>
-        <span class="session-title">Databricks Roadmap &amp; Genie Best Practices</span>
+      <li class="session-item active" data-session="session-20261015">
+        <span class="session-date">15 Oct 2026</span>
+        <span class="session-title">Metric Views &amp; AI-Built Semantics</span>
         <span class="session-badge new">Latest</span>
       </li>
-      <li class="session-item" data-session="session-placeholder">
-        <span class="session-date">Coming Soon</span>
-        <span class="session-title">Future Sessions</span>
+      <li class="session-item" data-session="session-20260917">
+        <span class="session-date">17 Sep 2026</span>
+        <span class="session-title">Databricks Roadmap &amp; Genie Best Practices</span>
       </li>
     </ul>
 
@@ -57,7 +57,7 @@
   <main id="content">
 
     <!-- ── SESSION: 17 Sep 2026 ── -->
-    <section id="session-20260917" class="session-page active">
+    <section id="session-20260917" class="session-page">
 
       <div class="hero hero-grid">
         <div>
@@ -1084,17 +1084,444 @@ AsyncDatabricksStore(
 
     </section>
 
-    <!-- ── Placeholder for future sessions ── -->
-    <section id="session-placeholder" class="session-page">
-      <div class="hero">
-        <div class="hero-badge">Coming Soon</div>
-        <h1>Future Sessions</h1>
-        <p class="hero-sub">Stay tuned for upcoming Lunch &amp; Learn topics. New sessions will appear here as they are scheduled.</p>
+    <!-- ══════════════════════════════════════════════════════════════ -->
+    <!-- ── SESSION: 15 Oct 2026 — Metric Views & AI-Built Semantics ── -->
+    <!-- ══════════════════════════════════════════════════════════════ -->
+    <section id="session-20261015" class="session-page active">
+
+      <div class="hero hero-grid">
+        <div>
+          <div class="hero-badge">Session 2 — 15 October 2026</div>
+          <h1>Governed Metrics<br>with UC Metric Views<br>&amp; AI to build them fast</h1>
+          <p class="hero-sub">A hands-on lab: turn your silver &amp; gold layers into a governed semantic layer with Unity Catalog Metric Views — and use Genie / AI tooling to find and build them fast, instead of circling the drain on alignment.</p>
+        </div>
+        <div class="terminal-card code-terminal">
+          <div class="terminal-header">
+            <span class="terminal-dot red"></span>
+            <span class="terminal-dot amber"></span>
+            <span class="terminal-dot green"></span>
+            <span class="terminal-title">mv_bookings.yaml</span>
+          </div>
+          <div class="terminal-body code-body">
+<pre class="code-block"><span class="kw">version</span>: 1.1
+<span class="kw">source</span>: catalog.schema.fact_bookings
+<span class="kw">measures</span>:
+  - <span class="kw">name</span>: Total TTV
+    <span class="kw">expr</span>: SUM(gross_booking_value)
+    <span class="kw">synonyms</span>: [TTV, turnover]   <span class="comment"># Genie speaks your language</span>
+    <span class="kw">format</span>: { type: currency, currency_code: AUD }
+  - <span class="kw">name</span>: Monthly TTV LY
+    <span class="kw">expr</span>: SUM(gross_booking_value)
+    <span class="kw">window</span>:
+      - { order: Booking Month, range: current,
+          semiadditive: last, <span class="kw">offset</span>: -12 month }  <span class="comment"># YoY</span></pre>
+          </div>
+        </div>
       </div>
-      <div class="content-card" style="text-align:center; padding:4rem 2rem;">
-        <p style="font-size:3rem; margin-bottom:1rem;">🗓️</p>
-        <p style="color:var(--text-secondary); font-size:1.1rem;">Check back soon for the next session agenda and materials.</p>
+
+      <div class="content-card tabs-card">
+        <div class="agenda-tabs" role="tablist" aria-label="Agenda tabs">
+          <button class="agenda-tab active" data-tab="mv-tab-overview" role="tab" aria-selected="true">Overview</button>
+          <button class="agenda-tab" data-tab="mv-tab-prereqs" role="tab" aria-selected="false">Prerequisites</button>
+          <button class="agenda-tab" data-tab="mv-tab-assets" role="tab" aria-selected="false">Get the assets</button>
+          <button class="agenda-tab" data-tab="mv-tab-discover" role="tab" aria-selected="false">Discover</button>
+          <button class="agenda-tab" data-tab="mv-tab-build" role="tab" aria-selected="false">Build</button>
+          <button class="agenda-tab" data-tab="mv-tab-ai" role="tab" aria-selected="false">AI + Genie</button>
+          <button class="agenda-tab" data-tab="mv-tab-powerbi" role="tab" aria-selected="false">Power BI → MV</button>
+        </div>
+
+        <!-- ═══════════════  OVERVIEW  ═══════════════ -->
+        <section id="mv-tab-overview" class="tab-panel active" role="tabpanel">
+          <div class="card-header compact">
+            <span class="agenda-num">01</span>
+            <div>
+              <h2>What we're building &amp; why</h2>
+              <p class="card-sub">A governed metric layer over a Horizon Travel Group (HTG) bookings dataset, built the fast way — AI finds the candidates and converts what you already have; you ratify.</p>
+            </div>
+          </div>
+
+          <div class="confidential-note">
+            <strong>The brief:</strong> target this not only on metric views but on leveraging Genie / AI tooling over our existing silver &amp; gold layers to build these metric views <em>much faster</em> — instead of circling the drain trying to get alignment.
+          </div>
+
+          <div class="two-col" style="margin-top:1.25rem;">
+            <div class="info-block">
+              <h3>The idea in one line</h3>
+              <p>Your metrics already exist — scattered across gold tables and a Power BI semantic model. The hard part was never computing them; it was <strong>agreeing</strong> and then <strong>governing</strong> one definition. Metric Views are that governed landing zone, and they're AI-native: Genie queries them directly.</p>
+            </div>
+            <div class="info-block highlight">
+              <h3>Two honest AI moves</h3>
+              <ul class="checklist">
+                <li><strong>Convert</strong> the Power BI model you already aligned on → Metric Views (Genie Code <code>/importBI</code>, ~40–75% automatic)</li>
+                <li><strong>Discover</strong> candidates from your gold tables using <strong>system tables</strong> — the most-queried &amp; most-joined tables</li>
+                <li>AI does <em>not</em> invent metrics from thin air — it accelerates; humans ratify the rest</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="arch-block">
+            <h3>The hands-on flow</h3>
+            <p class="card-sub" style="margin-bottom:1rem;">Six notebooks, run top to bottom. Each stage degrades gracefully if a workspace lacks a feature — nothing hard-fails the session.</p>
+            <div class="arch-diagram">
+              <div class="arch-row"><div class="arch-box ext">CSV — bookings + comments</div></div>
+              <div class="arch-arrow">↓ &nbsp;<span style="color:var(--text-secondary);font-size:.85rem;">01 · ingest → bronze → silver (or Lakeflow Designer)</span></div>
+              <div class="arch-row"><div class="arch-box backend">Gold star schema &nbsp;<span class="arch-sub">02 · fact_bookings + dims + PK/FK</span></div></div>
+              <div class="arch-arrow">↓</div>
+              <div class="arch-row multi">
+                <div class="arch-box ext">03 · Discover candidates<br><span class="arch-sub">system tables</span></div>
+                <div class="arch-box ext">04 · Build metric views<br><span class="arch-sub">filters · ratios · joins · windows · agentic metadata</span></div>
+                <div class="arch-box ext">05 · AI + Genie<br><span class="arch-sub">ai_classify · VoC · Q&amp;A</span></div>
+              </div>
+            </div>
+            <p class="card-sub" style="margin-top:.75rem;">Plus <strong>99</strong> — a zero-setup fallback on <code>samples.tpch</code>, and a presenter demo of Genie Code <code>/importBI</code> (Power BI → Metric Views).</p>
+          </div>
+        </section>
+
+        <!-- ═══════════════  PREREQUISITES  ═══════════════ -->
+        <section id="mv-tab-prereqs" class="tab-panel" role="tabpanel">
+          <div class="card-header compact">
+            <span class="agenda-num">02</span>
+            <div>
+              <h2>Prerequisites — set up before you arrive</h2>
+              <p class="card-sub">Bring your own workspace. A free trial works for the entire lab.</p>
+            </div>
+          </div>
+
+          <div class="two-col">
+            <div class="info-block">
+              <h3>Workspace &amp; compute</h3>
+              <ul class="checklist">
+                <li><strong>Unity Catalog</strong> enabled — a <a href="https://www.databricks.com/try-databricks" target="_blank" class="btn-link">free trial</a> is fine (set it up <em>before</em> the session)</li>
+                <li>Run the notebooks on <strong>serverless notebook compute</strong> — it's on the current runtime, so every feature works (validated on DBR 18.2)</li>
+                <li>⚠️ An <strong>old SQL warehouse</strong> (below DBR 16.4) rejects metric views with a confusing "Failed to parse YAML" error — the YAML's fine, the compute is too old. Use serverless notebook compute or a Current/Preview-channel warehouse.</li>
+                <li>Ability to <code>CREATE SCHEMA</code> in a catalog (on a trial, <code>workspace</code> usually works)</li>
+              </ul>
+            </div>
+            <div class="info-block highlight">
+              <h3>Runtime floors (don't panic if you're below)</h3>
+              <ul class="checklist">
+                <li>Metric Views (joins, filters, ratios, agentic metadata): <strong>DBR 16.4+</strong> (best 17.2+)</li>
+                <li><strong>Window &amp; offset</strong> measures (notebook 04 trends view): <strong>DBR 18.0+</strong></li>
+                <li><code>ai_classify</code> (notebook 05): serverless + Foundation Model API</li>
+                <li>System tables (notebook 03): enabled by a metastore admin + <code>SELECT</code> granted — otherwise the information_schema fallback runs</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="info-block" style="margin-top:1.25rem;">
+            <h3>Pre-session checklist</h3>
+            <ul class="checklist">
+              <li>Can log in to a UC-enabled workspace (trial OK)</li>
+              <li>Can start a <strong>serverless</strong> warehouse / compute</li>
+              <li>Cloned the repo as a Git folder <strong>or</strong> downloaded the notebooks + CSV (next tab)</li>
+              <li>Ran <code>00_setup</code> to the "✅ Setup done" cell</li>
+            </ul>
+          </div>
+        </section>
+
+        <!-- ═══════════════  GET THE ASSETS  ═══════════════ -->
+        <section id="mv-tab-assets" class="tab-panel" role="tabpanel">
+          <div class="card-header compact">
+            <span class="agenda-num">03</span>
+            <div>
+              <h2>Get the assets into your workspace</h2>
+              <p class="card-sub">Two ways — clone the whole lab, or download individual notebooks and upload them.</p>
+            </div>
+          </div>
+
+          <div class="two-col">
+            <div class="info-block highlight">
+              <h3>Option A — Clone as a Git folder (recommended)</h3>
+              <ul class="checklist">
+                <li>In your workspace: <strong>Workspace → Create → Git folder</strong></li>
+                <li>Repo URL: <code>https://github.com/VNSHANPR/Databricks_Lunch_N_Learn_Series</code></li>
+                <li>Open <code>metric-views-ai/notebooks/</code> — the data CSV sits beside it, so notebook <code>00</code> finds it automatically</li>
+              </ul>
+              <a href="https://github.com/VNSHANPR/Databricks_Lunch_N_Learn_Series/tree/main/metric-views-ai" target="_blank" class="btn-link">Browse the lab on GitHub →</a>
+            </div>
+            <div class="info-block">
+              <h3>Option B — Download &amp; upload</h3>
+              <ul class="checklist">
+                <li>Download the notebook <code>.py</code> files (tiles below)</li>
+                <li>In your workspace: <strong>Workspace → Import</strong> → drop the files in</li>
+                <li>Download the CSV; when <code>00_setup</code> prompts, upload it to the Unity Catalog <strong>Volume</strong> it creates</li>
+              </ul>
+              <p class="card-sub">Then run <code>00</code> → <code>01</code> → <code>02</code> → <code>03</code> → <code>04</code> → <code>05</code> in order.</p>
+            </div>
+          </div>
+
+          <div class="arch-block">
+            <h3>⬇️ Download the notebooks</h3>
+            <p class="card-sub" style="margin-bottom:1rem;">Click to download each notebook, then <strong>Workspace → Import</strong> it into your workspace — or clone the whole folder (Option A).</p>
+            <div class="resource-grid">
+              <a href="metric-views-ai/notebooks/00_setup.py" download class="resource-tile">
+                <span class="resource-icon">⚙️</span><strong>00 · Setup</strong>
+                <span class="resource-desc">Catalog / schema + data location</span>
+              </a>
+              <a href="metric-views-ai/notebooks/01_ingest_bronze_silver.py" download class="resource-tile">
+                <span class="resource-icon">🥉</span><strong>01 · Ingest → Silver</strong>
+                <span class="resource-desc">CSV → bronze → silver (Lakeflow Designer note)</span>
+              </a>
+              <a href="metric-views-ai/notebooks/02_build_gold_star_schema.py" download class="resource-tile">
+                <span class="resource-icon">⭐</span><strong>02 · Gold star schema</strong>
+                <span class="resource-desc">Fact + dimensions + PK/FK constraints</span>
+              </a>
+              <a href="metric-views-ai/notebooks/03_candidate_discovery_system_tables.py" download class="resource-tile">
+                <span class="resource-icon">🔎</span><strong>03 · Discover candidates</strong>
+                <span class="resource-desc">Crawl system tables for metric candidates</span>
+              </a>
+              <a href="metric-views-ai/notebooks/04_build_metric_views.py" download class="resource-tile">
+                <span class="resource-icon">📐</span><strong>04 · Build metric views</strong>
+                <span class="resource-desc">Filters · ratios · joins · windows · metadata</span>
+              </a>
+              <a href="metric-views-ai/notebooks/05_ai_enrichment_and_genie.py" download class="resource-tile">
+                <span class="resource-icon">🤖</span><strong>05 · AI + Genie</strong>
+                <span class="resource-desc">ai_classify over comments → VoC → Genie</span>
+              </a>
+              <a href="metric-views-ai/notebooks/99_appendix_tpch_fallback.py" download class="resource-tile">
+                <span class="resource-icon">🧯</span><strong>99 · TPC-H fallback</strong>
+                <span class="resource-desc">Zero-setup metric view on samples.tpch</span>
+              </a>
+              <a href="metric-views-ai/data/htg_bookings_raw.csv" download class="resource-tile">
+                <span class="resource-icon">📄</span><strong>Data · bookings CSV</strong>
+                <span class="resource-desc">30k synthetic HTG bookings (2024–2026)</span>
+              </a>
+            </div>
+          </div>
+        </section>
+
+        <!-- ═══════════════  DISCOVER  ═══════════════ -->
+        <section id="mv-tab-discover" class="tab-panel" role="tabpanel">
+          <div class="card-header compact">
+            <span class="agenda-num">04</span>
+            <div>
+              <h2>Find the candidates from your system tables</h2>
+              <p class="card-sub">The fastest way to decide <em>what</em> to turn into a metric view is to look at what your org already queries and joins. <strong>Notebook 03.</strong></p>
+            </div>
+          </div>
+
+          <div class="two-col">
+            <div class="info-block">
+              <h3>What the notebook crawls</h3>
+              <ul class="checklist">
+                <li><code>system.access.table_lineage</code> — most-<strong>referenced</strong> source tables (metric-view bases) &amp; tables that repeatedly feed the same output (join candidates)</li>
+                <li><code>system.query.history</code> — tables in <code>FROM</code>/<code>JOIN</code> clauses: most-<strong>queried</strong> and most co-queried pairs</li>
+                <li><strong>Fallback:</strong> <code>information_schema</code> FK constraints + a column-type heuristic — always works on a fresh trial with no history</li>
+              </ul>
+            </div>
+            <div class="info-block highlight">
+              <h3>The output</h3>
+              <ul class="checklist">
+                <li>A ranked shortlist of fact candidates and the joins they imply</li>
+                <li>Columns auto-classified into <strong>measures vs. dimensions</strong></li>
+                <li>An <strong>auto-suggested metric-view skeleton</strong> — the draft you hand the business to ratify, then flesh out in notebook 04</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="confidential-note" style="margin-top:1.25rem;">
+            <strong>Honest note:</strong> Genie Code won't scan your gold tables and invent metrics on its own — it needs an input (your Power BI model) or guidance. System-table discovery <em>is</em> that guidance, and it's fully deterministic.
+          </div>
+        </section>
+
+        <!-- ═══════════════  BUILD  ═══════════════ -->
+        <section id="mv-tab-build" class="tab-panel" role="tabpanel">
+          <div class="card-header compact">
+            <span class="agenda-num">05</span>
+            <div>
+              <h2>Build the metric view, layer by layer</h2>
+              <p class="card-sub">From a simple view to a production, AI-ready one. <strong>Notebook 04.</strong></p>
+            </div>
+          </div>
+
+          <div class="two-col">
+            <div class="info-block">
+              <h3>What we layer in</h3>
+              <ul class="checklist">
+                <li><strong>Filtered measures</strong> — Cancellation Rate, Refund Exposure (<code>FILTER (WHERE …)</code>)</li>
+                <li><strong>Ratios</strong> — Average Booking Value, Commission Rate (re-aggregate safely)</li>
+                <li><strong>Joins</strong> — customer / destination / product dimensions declared once</li>
+                <li><strong>Window &amp; period-over-period</strong> — trailing 30-day TTV; YoY via <code>offset: -12 month</code></li>
+                <li><strong>Agentic metadata</strong> — <code>comment</code>, <code>synonyms</code>, <code>format</code> on every field &amp; measure</li>
+              </ul>
+            </div>
+            <div class="info-block highlight">
+              <h3>Why agentic metadata matters</h3>
+              <p>Synonyms ("TTV", "turnover"), plain-English comments and format hints are exactly what Genie reads to answer <em>well</em>, not just <em>at all</em>. It's the difference between a metric view Genie <em>can</em> use and one it uses correctly, every time.</p>
+            </div>
+          </div>
+
+          <div class="arch-block">
+            <h3>Period-over-period with a window measure</h3>
+            <div class="terminal-card code-terminal">
+              <div class="terminal-header">
+                <span class="terminal-dot red"></span><span class="terminal-dot amber"></span><span class="terminal-dot green"></span>
+                <span class="terminal-title">mv_bookings_trends — YoY</span>
+              </div>
+              <div class="terminal-body code-body">
+<pre class="code-block"><span class="kw">measures</span>:
+  - <span class="kw">name</span>: Monthly TTV
+    <span class="kw">expr</span>: SUM(source.gross_booking_value)
+    <span class="kw">window</span>:
+      - { order: Booking Month, range: current, semiadditive: last }
+  - <span class="kw">name</span>: Monthly TTV LY
+    <span class="kw">expr</span>: SUM(source.gross_booking_value)
+    <span class="kw">window</span>:
+      - { order: Booking Month, range: current, semiadditive: last, <span class="kw">offset</span>: -12 month }
+  - <span class="kw">name</span>: TTV YoY Growth          <span class="comment"># derived — references other measures</span>
+    <span class="kw">expr</span>: (MEASURE(`Monthly TTV`) - MEASURE(`Monthly TTV LY`))
+          / NULLIF(MEASURE(`Monthly TTV LY`), 0)
+    <span class="kw">format</span>: { type: percent, decimal_places: 1 }</pre>
+              </div>
+            </div>
+            <p class="card-sub" style="margin-top:.75rem;">Window &amp; <code>offset</code> measures are GA but need <strong>DBR 18.0+</strong>. The notebook builds this as a separate <code>mv_bookings_trends</code> view and prints guidance (instead of failing) on older compute.</p>
+          </div>
+        </section>
+
+        <!-- ═══════════════  AI + GENIE  ═══════════════ -->
+        <section id="mv-tab-ai" class="tab-panel" role="tabpanel">
+          <div class="card-header compact">
+            <span class="agenda-num">06</span>
+            <div>
+              <h2>AI over the text, then Genie over the metrics</h2>
+              <p class="card-sub">Mine the free-text comments with AI Functions, then let Genie answer in plain English. <strong>Notebook 05.</strong></p>
+            </div>
+          </div>
+
+          <div class="two-col">
+            <div class="info-block">
+              <h3>AI Functions over silver/gold</h3>
+              <ul class="checklist">
+                <li><code>ai_classify</code> turns <code>customer_comments</code> into <strong>sentiment</strong> &amp; <strong>issue category</strong> dimensions</li>
+                <li>Classify the <strong>distinct</strong> comments and join back — cheap at scale, not one call per row</li>
+                <li>Feeds a Voice-of-Customer metric view: <code>Negative Comment Rate</code>, <code>TTV at Risk</code></li>
+              </ul>
+            </div>
+            <div class="info-block highlight">
+              <h3>Ask Genie (exercises your synonyms)</h3>
+              <ul class="checklist">
+                <li>"Total <strong>TTV</strong> by region last quarter?"</li>
+                <li>"<strong>Cancellation rate</strong> by brand?"</li>
+                <li>"<strong>Year on year growth</strong> in TTV for 2026?"</li>
+                <li>"<strong>TTV at risk</strong> by issue?"</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="arch-block">
+            <h3>Why this answers the brief</h3>
+            <p>Every Genie answer is consistent with the dashboards and SQL that use the same views — one governed definition of "TTV", not three. That consistency, reached fast via AI-assisted discovery and conversion, <strong>is</strong> the antidote to circling the drain on alignment.</p>
+            <a href="https://docs.databricks.com/aws/en/metric-views/" target="_blank" class="btn-link">Metric Views docs →</a>
+          </div>
+        </section>
+
+        <!-- ═══════════════  POWER BI → MV  ═══════════════ -->
+        <section id="mv-tab-powerbi" class="tab-panel" role="tabpanel">
+          <div class="card-header compact">
+            <span class="agenda-num">07</span>
+            <div>
+              <h2>Power BI → Metric Views (presenter demo)</h2>
+              <p class="card-sub">Genie Code's <code>/importBI</code> converts a Power BI model into Metric Views — the on-ramp for an existing semantic layer, not a rebuild.</p>
+            </div>
+          </div>
+
+          <div class="two-col">
+            <div class="info-block">
+              <h3>What it does</h3>
+              <ul class="checklist">
+                <li>Ingests a Power BI <code>.pbit</code>; extracts measures, relationships, dimensions</li>
+                <li>Emits Metric View YAML + an AI/BI dashboard scaffold</li>
+                <li>Auto-converts ~<strong>40–75%</strong>; complex DAX (iterators, calc groups, bidirectional) needs human review — <em>that review is the alignment, just far smaller</em></li>
+              </ul>
+            </div>
+            <div class="info-block highlight">
+              <h3>Run it as a demo, not hands-on</h3>
+              <ul class="checklist">
+                <li>Needs AI/BI access + "Partner-powered AI" enabled</li>
+                <li>⚠️ That toggle is removed <strong>1 Nov 2026</strong> — after which it's account-team-gated; trials usually lack it</li>
+                <li>Everyone does the discovery + build hands-on; the presenter drives <code>/importBI</code></li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="arch-block">
+            <h3>DAX → Metric View quick map</h3>
+            <div class="two-col">
+              <div class="info-block">
+                <ul class="checklist">
+                  <li><code>SUM/AVG/COUNT/DISTINCTCOUNT</code> → measure <code>expr</code> ✅</li>
+                  <li><code>CALCULATE([m], Year=2025)</code> → <code>FILTER (WHERE …)</code> ✅</li>
+                  <li>YoY <code>DATEADD(…,-1,YEAR)</code> → window <code>offset: -12 month</code> ✅</li>
+                  <li>7/30-day moving avg → window <code>range: trailing N day</code> ✅</li>
+                </ul>
+              </div>
+              <div class="info-block">
+                <ul class="checklist">
+                  <li>Fact table → <code>source</code>; relationships → <code>joins</code></li>
+                  <li>Calculation groups / <code>SUMX</code> / bidirectional → ⚠️ manual rewrite</li>
+                  <li>Row-level security → UC row filter / policy</li>
+                </ul>
+              </div>
+            </div>
+            <a href="https://docs.databricks.com/aws/en/dashboards/manage/import-bi" target="_blank" class="btn-link">Genie Code /importBI docs →</a>
+          </div>
+        </section>
       </div>
+
+      <!-- ─── Resources & Links ─── -->
+      <div class="content-card">
+        <div class="card-header">
+          <span class="agenda-num">📎</span>
+          <div>
+            <h2>Resources &amp; Hands-On</h2>
+            <p class="card-sub">Notebooks, data, and documentation for this session</p>
+          </div>
+        </div>
+
+        <div class="resource-grid">
+          <a href="https://github.com/VNSHANPR/Databricks_Lunch_N_Learn_Series/tree/main/metric-views-ai" target="_blank" class="resource-tile">
+            <span class="resource-icon">📦</span>
+            <strong>Lab repo folder</strong>
+            <span class="resource-desc">GitHub — clone or browse all assets</span>
+          </a>
+          <a href="https://github.com/VNSHANPR/Databricks_Lunch_N_Learn_Series/blob/main/metric-views-ai/docs/metric-views-ai-semantics.md" target="_blank" class="resource-tile">
+            <span class="resource-icon">📖</span>
+            <strong>Session deep-dive</strong>
+            <span class="resource-desc">The full written walkthrough</span>
+          </a>
+          <a href="https://github.com/VNSHANPR/Databricks_Lunch_N_Learn_Series/blob/main/metric-views-ai/docs/facilitator-guide.md" target="_blank" class="resource-tile">
+            <span class="resource-icon">🧑‍🏫</span>
+            <strong>Facilitator guide</strong>
+            <span class="resource-desc">Run-of-show &amp; timing (~75 min)</span>
+          </a>
+          <a href="https://github.com/VNSHANPR/Databricks_Lunch_N_Learn_Series/blob/main/metric-views-ai/demo/importBI_demo_runbook.md" target="_blank" class="resource-tile">
+            <span class="resource-icon">🎬</span>
+            <strong>/importBI demo runbook</strong>
+            <span class="resource-desc">Presenter script: Power BI → Metric Views</span>
+          </a>
+          <a href="https://docs.databricks.com/aws/en/metric-views/" target="_blank" class="resource-tile">
+            <span class="resource-icon">📘</span>
+            <strong>Metric Views docs</strong>
+            <span class="resource-desc">Official reference</span>
+          </a>
+          <a href="https://docs.databricks.com/aws/en/metric-views/data-modeling/window-measures" target="_blank" class="resource-tile">
+            <span class="resource-icon">📈</span>
+            <strong>Window measures</strong>
+            <span class="resource-desc">Trailing windows &amp; offsets</span>
+          </a>
+          <a href="https://docs.databricks.com/aws/en/dashboards/manage/import-bi" target="_blank" class="resource-tile">
+            <span class="resource-icon">🔄</span>
+            <strong>Genie Code /importBI</strong>
+            <span class="resource-desc">Power BI model conversion</span>
+          </a>
+          <a href="https://www.databricks.com/try-databricks" target="_blank" class="resource-tile">
+            <span class="resource-icon">🚀</span>
+            <strong>Free trial</strong>
+            <span class="resource-desc">Spin up a UC workspace</span>
+          </a>
+        </div>
+      </div>
+
     </section>
 
   </main>
