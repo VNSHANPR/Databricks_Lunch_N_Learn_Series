@@ -1,0 +1,323 @@
+# Databricks notebook source
+# MAGIC %md
+# MAGIC # 04 · Build the Metric Views
+# MAGIC
+# MAGIC We build up from a simple view to a **production, AI-ready** metric view, layering in:
+# MAGIC filtered measures → ratios → star-schema joins → **agentic metadata** (synonyms,
+# MAGIC comments, format). Then a separate **trends** view adds **window & period-over-period
+# MAGIC (offset)** measures.
+# MAGIC
+# MAGIC All measures are queried with the `MEASURE()` function. `SELECT *` is **not** supported.
+
+# COMMAND ----------
+
+dbutils.widgets.text("catalog", spark.conf.get("htg.catalog", "workspace"), "Catalog")
+dbutils.widgets.text("schema", spark.conf.get("htg.schema", "htg_metric_views_lab"), "Schema")
+CATALOG = dbutils.widgets.get("catalog").strip()
+SCHEMA = dbutils.widgets.get("schema").strip()
+FQ = f"{CATALOG}.{SCHEMA}"
+spark.sql(f"USE CATALOG {CATALOG}")
+spark.sql(f"USE SCHEMA {SCHEMA}")
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC ## Step 1 — The AI-ready metric view
+# MAGIC
+# MAGIC Note the **agentic metadata** on every field and measure:
+# MAGIC - `comment` — plain-English definition (what Genie reads to understand intent).
+# MAGIC - `synonyms` — alternative names so Genie matches business language
+# MAGIC   (e.g. *"TTV"*, *"total transaction value"* → the TTV measure).
+# MAGIC - `format` — currency/number formatting so results render correctly everywhere.
+# MAGIC
+# MAGIC This is what makes the difference between a metric view Genie *can* use and one it
+# MAGIC uses *well*.
+
+# COMMAND ----------
+
+mv_bookings = f"""
+CREATE OR REPLACE VIEW {FQ}.mv_bookings
+WITH METRICS
+LANGUAGE YAML
+AS $$
+version: 1.1
+comment: "HTG bookings — governed KPIs for leisure, corporate and SMB travel. Single source of truth for TTV, commission and booking volumes."
+source: {FQ}.fact_bookings
+
+joins:
+  - name: customer
+    source: {FQ}.dim_customer
+    on: source.customer_id = customer.customer_id
+  - name: destination
+    source: {FQ}.dim_destination
+    on: source.destination_id = destination.destination_id
+  - name: product
+    source: {FQ}.dim_product
+    on: source.product_id = product.product_id
+
+dimensions:
+  - name: Booking Date
+    expr: source.booking_date
+    comment: "Date the booking was made"
+    synonyms: [date, booking day, transaction date]
+  - name: Booking Month
+    expr: DATE_TRUNC('MONTH', source.booking_date)
+    comment: "Month the booking was made"
+    synonyms: [month]
+  - name: Booking Status
+    expr: source.booking_status
+    comment: "Confirmed, Completed, Cancelled or Amended"
+    synonyms: [status]
+  - name: Channel
+    expr: source.channel
+    comment: "Sales channel: Store, Online, Call Centre, Mobile App, Corporate Portal"
+    synonyms: [sales channel, booking channel]
+  - name: Brand
+    expr: product.brand
+    comment: "HTG trading brand"
+    synonyms: [trading brand, business]
+  - name: Product Type
+    expr: product.product_type
+    comment: "Flight, Hotel, Package, Cruise, Tour, Car Hire or Travel Insurance"
+    synonyms: [product, product category]
+  - name: Customer Segment
+    expr: customer.customer_segment
+    comment: "Leisure, Corporate or SMB"
+    synonyms: [segment]
+  - name: Loyalty Tier
+    expr: customer.loyalty_tier
+    synonyms: [tier, membership]
+  - name: Destination Region
+    expr: destination.destination_region
+    comment: "APAC, EMEA or Americas"
+    synonyms: [region, geography]
+  - name: Destination Country
+    expr: destination.destination_country
+    synonyms: [country]
+
+measures:
+  - name: Booking Count
+    expr: COUNT(1)
+    comment: "Number of bookings"
+    synonyms: [bookings, number of bookings, volume]
+    format:
+      type: number
+      decimal_places: 0
+
+  - name: Total TTV
+    expr: SUM(source.gross_booking_value)
+    comment: "Total Transaction Value — gross value of all bookings"
+    synonyms: [TTV, total transaction value, gross booking value, sales, turnover]
+    format:
+      type: currency
+      currency_code: AUD
+      decimal_places: 0
+
+  - name: Total Commission
+    expr: SUM(source.commission_amount)
+    comment: "Commission / margin earned by HTG"
+    synonyms: [commission, margin, revenue]
+    format:
+      type: currency
+      currency_code: AUD
+      decimal_places: 0
+
+  # --- Filtered measures ---
+  - name: Cancelled Bookings
+    expr: COUNT(1) FILTER (WHERE source.booking_status = 'Cancelled')
+    comment: "Bookings that were cancelled"
+    synonyms: [cancellations]
+    format:
+      type: number
+      decimal_places: 0
+
+  - name: Cancellation Rate
+    expr: COUNT(1) FILTER (WHERE source.booking_status = 'Cancelled') * 1.0 / COUNT(1)
+    comment: "Share of bookings cancelled"
+    synonyms: [cancel rate, cancellation %]
+    format:
+      type: percent
+      decimal_places: 1
+
+  - name: Refund Exposure
+    expr: SUM(source.refund_amount)
+    comment: "Total value refunded — money at risk / returned to customers"
+    synonyms: [refunds, refund value, money refunded]
+    format:
+      type: currency
+      currency_code: AUD
+      decimal_places: 0
+
+  # --- Ratio measures (re-aggregate safely) ---
+  - name: Average Booking Value
+    expr: SUM(source.gross_booking_value) / COUNT(1)
+    comment: "Average TTV per booking"
+    synonyms: [ABV, avg booking value, average TTV]
+    format:
+      type: currency
+      currency_code: AUD
+      decimal_places: 0
+
+  - name: Commission Rate
+    expr: SUM(source.commission_amount) / NULLIF(SUM(source.gross_booking_value), 0)
+    comment: "Commission as a percentage of TTV — HTG's effective margin"
+    synonyms: [margin rate, take rate, commission %]
+    format:
+      type: percent
+      decimal_places: 1
+
+  - name: Active Customers
+    expr: COUNT(DISTINCT source.customer_id)
+    comment: "Distinct customers who booked"
+    synonyms: [unique customers, customer count]
+    format:
+      type: number
+      decimal_places: 0
+$$
+"""
+try:
+    spark.sql(mv_bookings)
+    print("Created metric view:", f"{FQ}.mv_bookings")
+except Exception as e:
+    print("⚠️  Could not create the metric view.")
+    print("   If the error is METRIC_VIEW_INVALID_VIEW_DEFINITION / 'Failed to parse YAML',")
+    print("   your compute is below DBR 16.4 — metric views need 16.4+ (17.2+ recommended).")
+    print("   Fix: attach this notebook to serverless notebook compute (current runtime), or use")
+    print("   a SQL warehouse on the Current/Preview channel, then re-run. (Validated on DBR 18.2.)")
+    print("   Detail:", str(e)[:200])
+    raise
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC ### Query it — flexible aggregation at query time
+# MAGIC All measures via `MEASURE()`; group by any dimension(s).
+
+# COMMAND ----------
+
+display(spark.sql(f"""
+  SELECT
+    `Destination Region`,
+    `Product Type`,
+    MEASURE(`Total TTV`)             AS ttv,
+    MEASURE(`Total Commission`)      AS commission,
+    MEASURE(`Commission Rate`)       AS commission_rate,
+    MEASURE(`Cancellation Rate`)     AS cancel_rate,
+    MEASURE(`Average Booking Value`) AS abv
+  FROM {FQ}.mv_bookings
+  GROUP BY ALL
+  ORDER BY ttv DESC
+"""))
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC ## Step 2 — Trends view: window & period-over-period (offset) measures
+# MAGIC
+# MAGIC Window measures (trailing/rolling windows) and `offset` (period-over-period) are
+# MAGIC **GA**, but need **DBR 18.0+** (18.1+ for the `inclusive/exclusive` modifier). If your
+# MAGIC compute is older, this cell prints guidance instead of failing — the rest of the lab
+# MAGIC still works.
+
+# COMMAND ----------
+
+mv_trends = f"""
+CREATE OR REPLACE VIEW {FQ}.mv_bookings_trends
+WITH METRICS
+LANGUAGE YAML
+AS $$
+version: 1.1
+comment: "HTG booking trends — trailing windows and year-over-year growth"
+source: {FQ}.fact_bookings
+
+dimensions:
+  - name: Booking Date
+    expr: source.booking_date
+  - name: Booking Month
+    expr: DATE_TRUNC('MONTH', source.booking_date)
+
+measures:
+  - name: Daily TTV
+    expr: SUM(source.gross_booking_value)
+    format:
+      type: currency
+      currency_code: AUD
+
+  # Rolling 30-day TTV (trailing window, excludes the current day by default)
+  - name: TTV 30d Rolling
+    expr: SUM(source.gross_booking_value)
+    comment: "Trailing 30-day TTV"
+    synonyms: [rolling 30 day TTV, 30d TTV]
+    window:
+      - order: Booking Date
+        range: trailing 30 day
+        semiadditive: last
+    format:
+      type: currency
+      currency_code: AUD
+
+  # Monthly TTV and the same month a year earlier (offset), then YoY growth %
+  - name: Monthly TTV
+    expr: SUM(source.gross_booking_value)
+    window:
+      - order: Booking Month
+        range: current
+        semiadditive: last
+    format:
+      type: currency
+      currency_code: AUD
+
+  - name: Monthly TTV LY
+    expr: SUM(source.gross_booking_value)
+    comment: "Monthly TTV for the same month last year"
+    synonyms: [TTV last year, prior year TTV]
+    window:
+      - order: Booking Month
+        range: current
+        semiadditive: last
+        offset: -12 month
+    format:
+      type: currency
+      currency_code: AUD
+
+  - name: TTV YoY Growth
+    expr: (MEASURE(`Monthly TTV`) - MEASURE(`Monthly TTV LY`)) / NULLIF(MEASURE(`Monthly TTV LY`), 0)
+    comment: "Year-over-year TTV growth"
+    synonyms: [YoY growth, year on year growth]
+    format:
+      type: percent
+      decimal_places: 1
+$$
+"""
+try:
+    spark.sql(mv_trends)
+    print("Created trends metric view:", f"{FQ}.mv_bookings_trends")
+except Exception as e:
+    print("⚠️  Could not create window/offset view — your compute is likely below DBR 18.0.")
+    print("   Window & offset measures are GA on DBR 18.0+ (18.1+ for inclusive/exclusive).")
+    print("   Fix: attach a serverless warehouse/compute on the current channel, then re-run.")
+    print("   Detail:", str(e)[:200])
+
+# COMMAND ----------
+
+# Year-over-year TTV by month (only runs if the trends view was created above)
+if spark.catalog.tableExists(f"{FQ}.mv_bookings_trends"):
+    display(spark.sql(f"""
+      SELECT
+        `Booking Month`,
+        MEASURE(`Monthly TTV`)    AS ttv,
+        MEASURE(`Monthly TTV LY`) AS ttv_last_year,
+        MEASURE(`TTV YoY Growth`) AS yoy_growth
+      FROM {FQ}.mv_bookings_trends
+      WHERE `Booking Month` >= '2025-01-01'
+      GROUP BY ALL
+      ORDER BY `Booking Month`
+    """))
+else:
+    print("Trends view not created (needs DBR 18.0+). Skipping YoY query.")
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC ✅ Metric views built. Continue to **`05_ai_enrichment_and_genie`** to mine the free-text
+# MAGIC comments with AI and let Genie answer questions over these governed metrics.
