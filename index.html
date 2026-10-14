@@ -1163,8 +1163,10 @@ AsyncDatabricksStore(
             <h3>The hands-on flow</h3>
             <p class="card-sub" style="margin-bottom:1rem;">Six notebooks, run top to bottom. Each stage degrades gracefully if a workspace lacks a feature — nothing hard-fails the session.</p>
             <div class="arch-diagram">
-              <div class="arch-row"><div class="arch-box ext">CSV — bookings + comments</div></div>
-              <div class="arch-arrow">↓ &nbsp;<span style="color:var(--text-secondary);font-size:.85rem;">01 · ingest → bronze → silver (or Lakeflow Designer)</span></div>
+              <div class="arch-row"><div class="arch-box ext">CSV → small JSON files</div></div>
+              <div class="arch-arrow">↓ &nbsp;<span style="color:var(--text-secondary);font-size:.85rem;">00 · Auto Loader → Bronze streaming table (+ incremental load)</span></div>
+              <div class="arch-row"><div class="arch-box backend">Bronze → Silver &nbsp;<span class="arch-sub">01 · clean &amp; type (or Lakeflow Designer)</span></div></div>
+              <div class="arch-arrow">↓</div>
               <div class="arch-row"><div class="arch-box backend">Gold star schema &nbsp;<span class="arch-sub">02 · fact_bookings + dims + PK/FK</span></div></div>
               <div class="arch-arrow">↓</div>
               <div class="arch-row multi">
@@ -1173,7 +1175,7 @@ AsyncDatabricksStore(
                 <div class="arch-box ext">05 · AI + Genie<br><span class="arch-sub">ai_classify · VoC · Q&amp;A</span></div>
               </div>
             </div>
-            <p class="card-sub" style="margin-top:.75rem;">Plus <strong>99</strong> — a zero-setup fallback on <code>samples.tpch</code>, and a presenter demo of Genie Code <code>/importBI</code> (Power BI → Metric Views).</p>
+            <p class="card-sub" style="margin-top:.75rem;">Notebook <strong>05</strong> also includes a UI walkthrough of <strong>metric-view materialization</strong>. Plus <strong>99</strong> — a zero-setup fallback on <code>samples.tpch</code>, and a presenter demo of Genie Code <code>/importBI</code> (Power BI → Metric Views).</p>
           </div>
         </section>
 
@@ -1255,12 +1257,12 @@ AsyncDatabricksStore(
             <p class="card-sub" style="margin-bottom:1rem;">Click to download each notebook, then <strong>Workspace → Import</strong> it into your workspace — or clone the whole folder (Option A).</p>
             <div class="resource-grid">
               <a href="metric-views-ai/notebooks/00_setup.py" download class="resource-tile">
-                <span class="resource-icon">⚙️</span><strong>00 · Setup</strong>
-                <span class="resource-desc">Catalog / schema + data location</span>
+                <span class="resource-icon">⚙️</span><strong>00 · Setup + Auto Loader</strong>
+                <span class="resource-desc">Catalog/schema + Auto Loader → Bronze streaming table</span>
               </a>
               <a href="metric-views-ai/notebooks/01_ingest_bronze_silver.py" download class="resource-tile">
-                <span class="resource-icon">🥉</span><strong>01 · Ingest → Silver</strong>
-                <span class="resource-desc">CSV → bronze → silver (Lakeflow Designer note)</span>
+                <span class="resource-icon">🥉</span><strong>01 · Bronze → Silver</strong>
+                <span class="resource-desc">Clean &amp; type from the Auto Loader Bronze table</span>
               </a>
               <a href="metric-views-ai/notebooks/02_build_gold_star_schema.py" download class="resource-tile">
                 <span class="resource-icon">⭐</span><strong>02 · Gold star schema</strong>
@@ -1276,7 +1278,7 @@ AsyncDatabricksStore(
               </a>
               <a href="metric-views-ai/notebooks/05_ai_enrichment_and_genie.py" download class="resource-tile">
                 <span class="resource-icon">🤖</span><strong>05 · AI + Genie</strong>
-                <span class="resource-desc">ai_classify over comments → VoC → Genie</span>
+                <span class="resource-desc">ai_classify → VoC → Genie + materialization note</span>
               </a>
               <a href="metric-views-ai/notebooks/99_appendix_tpch_fallback.py" download class="resource-tile">
                 <span class="resource-icon">🧯</span><strong>99 · TPC-H fallback</strong>
