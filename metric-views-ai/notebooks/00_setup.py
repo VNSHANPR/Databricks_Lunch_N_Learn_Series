@@ -258,8 +258,54 @@ print("Bronze rows after incremental load:", spark.table(BRONZE).count())
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC ✅ **Setup done.** You now have a **Bronze streaming table** (`bookings_bronze`) built by
-# MAGIC Auto Loader. Continue to **`01_ingest_bronze_silver`** to shape Silver, then Gold.
+# MAGIC ## 6. (Optional, serverless) The same ingest as a managed **Streaming Table**
+# MAGIC
+# MAGIC The `bookings_bronze` table above is a normal Delta table that a Structured Streaming job
+# MAGIC *writes to* — correct and incremental, but Unity Catalog lists it as an **ordinary table**
+# MAGIC (no streaming icon). A **Streaming Table (ST)** is a different, *declarative* object: you
+# MAGIC describe the result and Databricks runs a **managed pipeline** to keep it current. That's
+# MAGIC the object that shows the **streaming icon** in Catalog Explorer.
+# MAGIC
+# MAGIC Run the next cell to create one — named `bookings_bronze_st` so it doesn't clash with the
+# MAGIC section-4 table. **Serverless only**, and the first run spins up a managed pipeline, so
+# MAGIC give it a minute. *(This is optional — the rest of the lab runs on `bookings_bronze`.)*
+
+# COMMAND ----------
+
+# OPTIONAL — creates a managed Streaming Table (needs serverless). Safe to skip.
+create_st = f"""
+CREATE OR REFRESH STREAMING TABLE {FQ}.bookings_bronze_st AS
+SELECT
+  *,
+  _metadata.file_path AS _source_file,
+  current_timestamp() AS _ingested_at
+FROM STREAM read_files(
+  '{LANDING}',
+  format => 'json',
+  inferColumnTypes => true
+)
+"""
+try:
+    spark.sql(create_st)
+    print("Created managed Streaming Table:", f"{FQ}.bookings_bronze_st")
+    print("Rows:", spark.table(f"{FQ}.bookings_bronze_st").count())
+    print("Open it in Catalog Explorer — it carries the streaming-table icon.")
+    print("Ingest new files later: drop them in", LANDING, "then run")
+    print(f"  REFRESH STREAMING TABLE {FQ}.bookings_bronze_st")
+    print("  (or use the Refresh action in Catalog Explorer).")
+except Exception as e:
+    print("⚠️  Could not create the Streaming Table — this needs serverless compute")
+    print("   (classic compute can't create a managed streaming table). The lab continues")
+    print("   fine on the section-4 `bookings_bronze` table.")
+    print("   Detail:", str(e)[:200])
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC ✅ **Setup done.** You now have a **Bronze table** (`bookings_bronze`), incrementally
+# MAGIC loaded by Auto Loader — plus, optionally, a managed **Streaming Table**
+# MAGIC (`bookings_bronze_st`) if you ran section 6. Continue to **`01_ingest_bronze_silver`**
+# MAGIC to shape Silver, then Gold.
 # MAGIC
 # MAGIC > Everything you create lives in `{catalog}.{schema}`. To clean up after the session:
 # MAGIC > `DROP SCHEMA {catalog}.{schema} CASCADE;` and delete the Volume's `landing/`,

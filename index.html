@@ -1161,7 +1161,7 @@ AsyncDatabricksStore(
 
           <div class="arch-block">
             <h3>The hands-on flow</h3>
-            <p class="card-sub" style="margin-bottom:1rem;">Six notebooks, run top to bottom. Each stage degrades gracefully if a workspace lacks a feature — nothing hard-fails the session.</p>
+            <p class="card-sub" style="margin-bottom:1rem;">Six core notebooks, run top to bottom. Each stage degrades gracefully if a workspace lacks a feature — nothing hard-fails the session.</p>
             <div class="arch-diagram">
               <div class="arch-row"><div class="arch-box ext">CSV → small JSON files</div></div>
               <div class="arch-arrow">↓ &nbsp;<span style="color:var(--text-secondary);font-size:.85rem;">00 · Auto Loader → Bronze streaming table (+ incremental load)</span></div>
@@ -1175,7 +1175,7 @@ AsyncDatabricksStore(
                 <div class="arch-box ext">05 · AI + Genie<br><span class="arch-sub">ai_classify · VoC · Q&amp;A</span></div>
               </div>
             </div>
-            <p class="card-sub" style="margin-top:.75rem;">Notebook <strong>05</strong> also includes a UI walkthrough of <strong>metric-view materialization</strong>. Plus <strong>99</strong> — a zero-setup fallback on <code>samples.tpch</code>, and a presenter demo of Genie Code <code>/importBI</code> (Power BI → Metric Views).</p>
+            <p class="card-sub" style="margin-top:.75rem;">Notebook <strong>05</strong> also includes a UI walkthrough of <strong>metric-view materialization</strong>. Plus <strong>06</strong> — the production <strong>Lakeflow Declarative Pipeline</strong> (streaming medallion), <strong>99</strong> — a zero-setup fallback on <code>samples.tpch</code>, and a presenter demo of Genie Code <code>/importBI</code> (Power BI → Metric Views).</p>
           </div>
         </section>
 
@@ -1279,6 +1279,10 @@ AsyncDatabricksStore(
               <a href="metric-views-ai/notebooks/05_ai_enrichment_and_genie.py" download class="resource-tile">
                 <span class="resource-icon">🤖</span><strong>05 · AI + Genie</strong>
                 <span class="resource-desc">ai_classify → VoC → Genie + materialization note</span>
+              </a>
+              <a href="metric-views-ai/notebooks/06_production_pipeline.py" download class="resource-tile">
+                <span class="resource-icon">🏭</span><strong>06 · Production pipeline</strong>
+                <span class="resource-desc">Lakeflow Declarative Pipeline (streaming medallion)</span>
               </a>
               <a href="metric-views-ai/notebooks/99_appendix_tpch_fallback.py" download class="resource-tile">
                 <span class="resource-icon">🧯</span><strong>99 · TPC-H fallback</strong>
