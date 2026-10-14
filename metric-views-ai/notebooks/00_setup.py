@@ -265,53 +265,65 @@ print("Bronze rows after incremental load:", spark.table(BRONZE).count())
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC ## 6. (Optional, serverless) The same ingest as a managed **Streaming Table**
+# MAGIC ## 6. In production, Bronze is a managed **Streaming Table** (SDP)
 # MAGIC
-# MAGIC The `bookings_bronze` table above is a normal Delta table that a Structured Streaming job
-# MAGIC *writes to* — correct and incremental, but Unity Catalog lists it as an **ordinary table**
-# MAGIC (no streaming icon). A **Streaming Table (ST)** is a different, *declarative* object: you
-# MAGIC describe the result and Databricks runs a **managed pipeline** to keep it current. That's
-# MAGIC the object that shows the **streaming icon** in Catalog Explorer.
+# MAGIC The `bookings_bronze` table we just built is a normal Delta table that a Structured
+# MAGIC Streaming job *writes to* — correct and incremental, but Unity Catalog lists it as an
+# MAGIC **ordinary table** (no streaming icon). In production you'd instead declare a managed
+# MAGIC **Streaming Table (ST)**: you describe the result and Databricks runs a **managed
+# MAGIC pipeline** to keep it current. That's the object that carries the **streaming icon** in
+# MAGIC Catalog Explorer, and it's the Bronze layer of a **Lakeflow Spark Declarative Pipeline
+# MAGIC (SDP)**.
 # MAGIC
-# MAGIC Run the next cell to create one — named `bookings_bronze_st` so it doesn't clash with the
-# MAGIC section-4 table. **Serverless only**, and the first run spins up a managed pipeline, so
-# MAGIC give it a minute. *(This is optional — the rest of the lab runs on `bookings_bronze`.)*
-
-# COMMAND ----------
-
-# OPTIONAL — creates a managed Streaming Table (needs serverless). Safe to skip.
-create_st = f"""
-CREATE OR REFRESH STREAMING TABLE {FQ}.bookings_bronze_st AS
-SELECT
-  *,
-  _metadata.file_path AS _source_file,
-  current_timestamp() AS _ingested_at
-FROM STREAM read_files(
-  '{LANDING}',
-  format => 'json',
-  inferColumnTypes => true
-)
-"""
-try:
-    spark.sql(create_st)
-    print("Created managed Streaming Table:", f"{FQ}.bookings_bronze_st")
-    print("Rows:", spark.table(f"{FQ}.bookings_bronze_st").count())
-    print("Open it in Catalog Explorer — it carries the streaming-table icon.")
-    print("Ingest new files later: drop them in", LANDING, "then run")
-    print(f"  REFRESH STREAMING TABLE {FQ}.bookings_bronze_st")
-    print("  (or use the Refresh action in Catalog Explorer).")
-except Exception as e:
-    print("⚠️  Could not create the Streaming Table — this needs serverless compute")
-    print("   (classic compute can't create a managed streaming table). The lab continues")
-    print("   fine on the section-4 `bookings_bronze` table.")
-    print("   Detail:", str(e)[:200])
+# MAGIC **Why we don't create one from this notebook.** A Streaming Table is never built by the
+# MAGIC compute you launch it from — `CREATE STREAMING TABLE` only *registers* it, and a
+# MAGIC **system-managed serverless pipeline** does the actual ingest. That statement is accepted
+# MAGIC only from a **SQL warehouse** or a **Lakeflow pipeline** (or a serverless notebook *where
+# MAGIC the capability is enabled* — many trial/classic workspaces reject it with
+# MAGIC `ST_NOT_ENABLED_ON_SERVERLESS_GENERIC_COMPUTE`). Rather than let the lab fail
+# MAGIC confusingly, we keep ingestion on the Auto Loader table above and just *show* the
+# MAGIC production shape here.
+# MAGIC
+# MAGIC **SQL — the Bronze ST as you'd define it in an SDP pipeline (or run from a SQL warehouse):**
+# MAGIC ```sql
+# MAGIC CREATE OR REFRESH STREAMING TABLE bookings_bronze AS
+# MAGIC SELECT
+# MAGIC   *,
+# MAGIC   _metadata.file_path  AS _source_file,
+# MAGIC   current_timestamp()  AS _ingested_at
+# MAGIC FROM STREAM read_files(
+# MAGIC   '/Volumes/<catalog>/<schema>/raw_files/landing',
+# MAGIC   format => 'json',
+# MAGIC   inferColumnTypes => true
+# MAGIC );
+# MAGIC ```
+# MAGIC
+# MAGIC **Python (Lakeflow Declarative Pipelines) — the same table in a pipeline source file:**
+# MAGIC ```python
+# MAGIC import dlt
+# MAGIC
+# MAGIC @dlt.table(name="bookings_bronze", comment="Raw bookings — Auto Loader ingest")
+# MAGIC def bookings_bronze():
+# MAGIC     return (
+# MAGIC         spark.readStream.format("cloudFiles")
+# MAGIC             .option("cloudFiles.format", "json")
+# MAGIC             .option("cloudFiles.inferColumnTypes", "true")
+# MAGIC             .load("/Volumes/<catalog>/<schema>/raw_files/landing")
+# MAGIC     )
+# MAGIC ```
+# MAGIC
+# MAGIC Both run **inside** a pipeline, not interactively — the pipeline runtime is what
+# MAGIC materializes the ST and manages its checkpoint, incremental refresh, and lineage. The
+# MAGIC full Bronze → Silver → Gold pipeline (streaming tables + materialized-view dimensions +
+# MAGIC data-quality expectations) is laid out in **`06_production_pipeline`** — run that as a
+# MAGIC Lakeflow pipeline to see real streaming-table icons in Catalog Explorer.
 
 # COMMAND ----------
 
 # MAGIC %md
 # MAGIC ✅ **Setup done.** You now have a **Bronze table** (`bookings_bronze`), incrementally
-# MAGIC loaded by Auto Loader — plus, optionally, a managed **Streaming Table**
-# MAGIC (`bookings_bronze_st`) if you ran section 6. Continue to **`01_ingest_bronze_silver`**
+# MAGIC loaded by Auto Loader. Section 6 above shows how that same Bronze layer becomes a managed
+# MAGIC **Streaming Table** in a production SDP pipeline. Continue to **`01_ingest_bronze_silver`**
 # MAGIC to shape Silver, then Gold.
 # MAGIC
 # MAGIC > Everything you create lives in `{catalog}.{schema}`. To clean up after the session:

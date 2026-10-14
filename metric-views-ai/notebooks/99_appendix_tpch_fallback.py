@@ -9,25 +9,45 @@
 
 # COMMAND ----------
 
-# Read the config written by notebook 00 if present (this appendix also runs
-# standalone). Serverless rejects custom spark.conf keys, so we read a JSON file.
+# Catalog & schema come from notebook 00's config if present. This appendix also runs
+# standalone, so if 00 wasn't run we fall back to the current catalog + the lab schema and
+# create it. Either way, no per-notebook catalog/schema widget to keep in sync.
 import json
 
-DEFAULT_CATALOG, DEFAULT_SCHEMA = "workspace", "htg_metric_views_lab"
-try:
-    _cfg = json.loads(dbutils.fs.head(
-        f"/Volumes/{DEFAULT_CATALOG}/{DEFAULT_SCHEMA}/raw_files/_htg_config.json"))
-except Exception:
-    _cfg = {}
+LAB_SCHEMA = "htg_metric_views_lab"   # lab's fixed schema name — used to locate 00's config / as fallback
 
-dbutils.widgets.text("catalog", _cfg.get("htg.catalog", DEFAULT_CATALOG), "Catalog")
-dbutils.widgets.text("schema", _cfg.get("htg.schema", DEFAULT_SCHEMA), "Schema")
-CATALOG = dbutils.widgets.get("catalog").strip()
-SCHEMA = dbutils.widgets.get("schema").strip()
+def _read_lab_cfg():
+    cats = []
+    try:
+        cats.append(spark.sql("SELECT current_catalog()").first()[0])
+    except Exception:
+        pass
+    try:
+        cats += [r[0] for r in spark.sql("SHOW CATALOGS").collect()]
+    except Exception:
+        pass
+    for cat in dict.fromkeys(cats):
+        try:
+            return json.loads(dbutils.fs.head(
+                f"/Volumes/{cat}/{LAB_SCHEMA}/raw_files/_htg_config.json"))
+        except Exception:
+            continue
+    return None
+
+_cfg = _read_lab_cfg()
+if _cfg:
+    CATALOG, SCHEMA = _cfg["htg.catalog"], _cfg["htg.schema"]
+else:
+    try:
+        CATALOG = spark.sql("SELECT current_catalog()").first()[0]
+    except Exception:
+        CATALOG = "workspace"
+    SCHEMA = LAB_SCHEMA
 FQ = f"{CATALOG}.{SCHEMA}"
 spark.sql(f"CREATE SCHEMA IF NOT EXISTS {FQ}")
 spark.sql(f"USE CATALOG {CATALOG}")
 spark.sql(f"USE SCHEMA {SCHEMA}")
+print(f"Using {FQ}")
 
 # COMMAND ----------
 
