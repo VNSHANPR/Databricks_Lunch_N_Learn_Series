@@ -4,8 +4,10 @@
 # MAGIC
 # MAGIC **Session:** Governed Metrics with Unity Catalog Metric Views + AI acceleration
 # MAGIC
-# MAGIC This notebook sets up the catalog, schema and data location you'll use for the
-# MAGIC rest of the lab. Run it once, top to bottom.
+# MAGIC This notebook sets up the catalog, schema and data location, then **lands the raw
+# MAGIC bookings with Auto Loader into a streaming Bronze table** — including an incremental
+# MAGIC load so you can watch Auto Loader pick up new files as they arrive. Run it once, top
+# MAGIC to bottom.
 # MAGIC
 # MAGIC ### What you need
 # MAGIC - A Databricks workspace (a **free trial is fine**) with **Unity Catalog** enabled.
@@ -130,7 +132,138 @@ print("Wrote lab config to", CONFIG_PATH)
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC ✅ **Setup done.** Continue to **`01_ingest_bronze_silver`**.
+# MAGIC ## 3. Split the raw file into a landing zone for Auto Loader
+# MAGIC
+# MAGIC Real pipelines ingest **many files that arrive over time**, not one big CSV. So we
+# MAGIC split the raw file into several small **JSON** files in a `landing/` folder on the
+# MAGIC Volume, and **hold back a little data** in `incoming_later/` to simulate new files
+# MAGIC arriving after the first load.
+
+# COMMAND ----------
+
+import csv, math
+
+LANDING  = f"{VOLUME_PATH}/landing"
+INCOMING = f"{VOLUME_PATH}/incoming_later"
+for d in (LANDING, INCOMING):
+    dbutils.fs.mkdirs(d)        # idempotent; works on UC Volumes (open() below needs the dir)
+
+if not CSV_PATH:
+    raise Exception("No source CSV found — complete section 2 (make the CSV available) first.")
+
+INT_COLS   = {"lead_time_days", "pax_count"}
+FLOAT_COLS = {"gross_booking_value", "commission_amount", "refund_amount"}
+
+def _coerce(row):
+    """Give JSON sensible native types so Bronze isn't all-strings; dates stay strings."""
+    out = {}
+    for k, v in row.items():
+        if v is None or v == "":
+            out[k] = None
+        elif k in INT_COLS:
+            try: out[k] = int(float(v))
+            except Exception: out[k] = None
+        elif k in FLOAT_COLS:
+            try: out[k] = float(v)
+            except Exception: out[k] = None
+        else:
+            out[k] = v
+    return out
+
+def _write_jsonl(records, path):
+    with open(path, "w") as fh:
+        for rec in records:
+            fh.write(json.dumps(rec) + "\n")
+
+with open(CSV_PATH, newline="") as f:
+    rows = [_coerce(r) for r in csv.DictReader(f)]
+
+HOLDBACK = 100                                   # rows saved for the incremental demo
+initial, later = rows[:len(rows) - HOLDBACK], rows[len(rows) - HOLDBACK:]
+
+# Initial load: 8 small files in landing/
+N_FILES = 8
+step = math.ceil(len(initial) / N_FILES)
+for i in range(N_FILES):
+    _write_jsonl(initial[i * step:(i + 1) * step], f"{LANDING}/bookings_{i:03d}.json")
+
+# Incremental: 2 files staged OUTSIDE landing/ — we add them after the first load.
+half = math.ceil(len(later) / 2)
+_write_jsonl(later[:half], f"{INCOMING}/bookings_new_001.json")
+_write_jsonl(later[half:], f"{INCOMING}/bookings_new_002.json")
+
+print(f"Wrote {N_FILES} initial files ({len(initial)} rows) to {LANDING}")
+print(f"Staged 2 incremental files ({len(later)} rows) in {INCOMING}")
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC ## 4. Auto Loader → Bronze **streaming table**
+# MAGIC
+# MAGIC `cloudFiles` (Auto Loader) incrementally ingests files from the landing folder. We use
+# MAGIC `trigger(availableNow=True)` so it processes everything available **and then stops** —
+# MAGIC ideal for a lab. A **checkpoint** records which files it has already seen, so re-running
+# MAGIC only picks up *new* files. The target Delta table is our **Bronze** layer.
+# MAGIC
+# MAGIC > Runs on serverless or any standard compute. No cloud notifications to configure —
+# MAGIC > Auto Loader uses directory listing by default.
+
+# COMMAND ----------
+
+from pyspark.sql import functions as F
+
+BRONZE     = f"{FQ}.bookings_bronze"
+CKPT       = f"{VOLUME_PATH}/_autoloader/bookings_bronze/checkpoint"
+SCHEMA_LOC = f"{VOLUME_PATH}/_autoloader/bookings_bronze/schema"
+
+def run_autoloader():
+    """Ingest any new files in LANDING into the Bronze table, then stop."""
+    stream = (spark.readStream.format("cloudFiles")
+        .option("cloudFiles.format", "json")
+        .option("cloudFiles.schemaLocation", SCHEMA_LOC)
+        .option("cloudFiles.inferColumnTypes", "true")
+        .load(LANDING)
+        .withColumn("_ingested_at", F.current_timestamp())
+        .withColumn("_source_file", F.col("_metadata.file_path")))
+    (stream.writeStream
+        .option("checkpointLocation", CKPT)
+        .trigger(availableNow=True)
+        .toTable(BRONZE)
+        .awaitTermination())
+
+run_autoloader()
+print("Bronze rows after initial load:", spark.table(BRONZE).count())
+display(spark.table(BRONZE).limit(5))
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC ## 5. Simulate new files arriving — Auto Loader catches up
+# MAGIC
+# MAGIC We move the two staged files into `landing/` and run the **same** Auto Loader again.
+# MAGIC Because the checkpoint remembers the first 8 files, only the **2 new files** are read,
+# MAGIC and the Bronze row count goes up.
+
+# COMMAND ----------
+
+for fn in ("bookings_new_001.json", "bookings_new_002.json"):
+    try:
+        dbutils.fs.mv(f"{INCOMING}/{fn}", f"{LANDING}/{fn}")
+    except Exception as e:
+        print("skip (already moved?):", fn, "->", str(e)[:80])
+
+run_autoloader()   # same checkpoint → only the 2 new files are ingested
+print("Bronze rows after incremental load:", spark.table(BRONZE).count())
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC ✅ **Setup done.** You now have a **Bronze streaming table** (`bookings_bronze`) built by
+# MAGIC Auto Loader. Continue to **`01_ingest_bronze_silver`** to shape Silver, then Gold.
 # MAGIC
 # MAGIC > Everything you create lives in `{catalog}.{schema}`. To clean up after the session:
-# MAGIC > `DROP SCHEMA {catalog}.{schema} CASCADE;`
+# MAGIC > `DROP SCHEMA {catalog}.{schema} CASCADE;` and delete the Volume's `landing/`,
+# MAGIC > `incoming_later/` and `_autoloader/` folders.
+# MAGIC >
+# MAGIC > Re-running from scratch? Also `DROP TABLE {catalog}.{schema}.bookings_bronze` and
+# MAGIC > delete `_autoloader/` so Auto Loader starts with a fresh checkpoint.

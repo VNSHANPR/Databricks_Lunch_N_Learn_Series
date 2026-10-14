@@ -177,6 +177,49 @@ else:
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC 🎉 **You've gone end-to-end:** CSV → silver → gold star schema → AI-derived dimensions
-# MAGIC → governed, AI-ready metric views → Genie. See `99_appendix_tpch_fallback` for a
-# MAGIC zero-setup version on the built-in `samples.tpch` data.
+# MAGIC ## Step 4 — (Optional) Materialize the metric view
+# MAGIC
+# MAGIC Metric views compute at **query time** by default. For heavy dashboards or large
+# MAGIC sources you can **materialize** them: Databricks pre-computes the aggregates on a
+# MAGIC schedule (via a Lakeflow Declarative Pipeline under the hood) and queries read the
+# MAGIC pre-computed results. We show this **in the UI** rather than in code — the metric
+# MAGIC definition and the `MEASURE()` SQL you write don't change.
+# MAGIC
+# MAGIC ### How it's declared
+# MAGIC Materialization is a **`materialization:`** block in the metric view's YAML. Add it by
+# MAGIC editing the view in **Catalog Explorer → (your metric view) → Edit definition**, e.g.:
+# MAGIC
+# MAGIC ```yaml
+# MAGIC materialization:
+# MAGIC   schedule: every 6 hours      # same syntax as a scheduled materialized view
+# MAGIC   mode: relaxed                # only "relaxed" is supported today
+# MAGIC   materialized_views:
+# MAGIC     - name: ttv_by_region
+# MAGIC       type: aggregated         # pre-compute specific dimension/measure combos
+# MAGIC       dimensions: [Destination Region, Product Type]
+# MAGIC       measures: [Total TTV, Total Commission, Booking Count]
+# MAGIC ```
+# MAGIC
+# MAGIC - **`aggregated`** pre-computes chosen dimension/measure combinations (fast, targeted).
+# MAGIC - **`unaggregated`** materializes the full joined/filtered model — good for expensive
+# MAGIC   source views or many joins.
+# MAGIC
+# MAGIC ### Watching it in the UI
+# MAGIC 1. Open the metric view in **Catalog Explorer** — a materialized view shows its backing
+# MAGIC    **pipeline** and the **refresh schedule / last-refresh** status.
+# MAGIC 2. Click **Refresh** to update on demand, or let the schedule run it.
+# MAGIC 3. Genie, dashboards and SQL automatically read the pre-computed data — no query changes.
+# MAGIC
+# MAGIC ### Requirements & notes
+# MAGIC - **Serverless compute** enabled and **DBR 17.2+**.
+# MAGIC - Materialization is **experimental**; `TRIGGER ON UPDATE` isn't supported.
+# MAGIC - Think of it as a **performance switch**: same governed definition, faster reads — you
+# MAGIC   trade a little freshness (schedule-based) and compute for speed.
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC 🎉 **You've gone end-to-end:** Auto Loader Bronze → Silver → Gold star schema →
+# MAGIC AI-derived dimensions → governed, AI-ready metric views → Genie (and optional
+# MAGIC materialization). See `99_appendix_tpch_fallback` for a zero-setup version on the
+# MAGIC built-in `samples.tpch` data.
