@@ -167,10 +167,11 @@ a:hover { text-decoration: underline; }
   margin-left: var(--sidebar-w);
   min-height: 100vh;
   padding: 2rem 2.5rem 4rem;
-  max-width: 1180px;
 }
 .session-page { display: none; }
-.session-page.active { display: block; }
+/* Cap the reading width and center it in the space next to the sidebar, so wide
+   screens get balanced margins instead of all the empty space on the right. */
+.session-page.active { display: block; max-width: 1180px; margin: 0 auto; }
 
 /* Hero */
 .hero {
