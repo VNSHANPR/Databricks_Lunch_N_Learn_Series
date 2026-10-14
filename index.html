@@ -1162,6 +1162,10 @@ AsyncDatabricksStore(
           <div class="arch-block">
             <h3>The hands-on flow</h3>
             <p class="card-sub" style="margin-bottom:1rem;">Six core notebooks, run top to bottom. Each stage degrades gracefully if a workspace lacks a feature — nothing hard-fails the session.</p>
+            <div class="arch-figure" style="overflow-x:auto;">
+              <img src="metric-views-ai/assets/architecture.svg" loading="lazy" alt="HTG booking data architecture: retail outlet channels (Store, Online, Call Centre, Mobile App, Corporate Portal) emit bookings as JSON files into a Unity Catalog Volume landing folder; Auto Loader (cloudFiles) incrementally ingests them into a Bronze streaming table, cleaned into Silver and modelled into a Gold star schema (fact_bookings + dimensions, PK/FK RELY); ai_classify enriches customer comments into sentiment and issue_category; governed Unity Catalog Metric Views (mv_bookings, mv_bookings_trends, mv_bookings_voc) are consumed by AI/BI Genie, dashboards and SQL — all governed by Unity Catalog, with the medallion runnable as a Lakeflow Declarative Pipeline in production." style="min-width:1100px; width:2352px; max-width:none;">
+            </div>
+            <figcaption class="card-sub" style="margin-top:.6rem;">Booking data from the retail outlet → Auto Loader → medallion → AI enrichment → governed Metric Views → Genie / dashboards / SQL. Scroll horizontally to see the full flow. <a href="metric-views-ai/assets/architecture.svg" target="_blank" rel="noopener" class="btn-link">Open full size →</a></figcaption>
             <div class="arch-diagram">
               <div class="arch-row"><div class="arch-box ext">CSV → small JSON files</div></div>
               <div class="arch-arrow">↓ &nbsp;<span style="color:var(--text-secondary);font-size:.85rem;">00 · Auto Loader → Bronze streaming table (+ incremental load)</span></div>

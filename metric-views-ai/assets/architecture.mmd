@@ -1,0 +1,80 @@
+flowchart LR
+    subgraph UC["Unity Catalog - governance, lineage & permissions across all layers"]
+        direction LR
+
+        subgraph SRC["Sources - HTG retail outlets"]
+            direction TB
+            S1["Store"]
+            S2["Online"]
+            S3["Call Centre"]
+            S4["Mobile App"]
+            S5["Corporate Portal"]
+        end
+
+        subgraph LAND["Landing (cloud Volume)"]
+            direction TB
+            L1["Booking records as JSON files<br/>/Volumes/.../landing/"]
+            L2["new files arrive over time"]
+        end
+
+        subgraph ING["Ingestion"]
+            direction TB
+            A1["Auto Loader (cloudFiles)<br/>incremental file ingestion<br/>→ streaming"]
+        end
+
+        subgraph MED["Medallion (Delta / Unity Catalog)"]
+            direction TB
+            B["Bronze: bookings_bronze<br/>streaming table, raw as-landed"]
+            SV["Silver: bookings_silver<br/>cleaned & typed: dates, DECIMAL money,<br/>trimmed text; data-quality expectations"]
+            G["Gold: star schema<br/>fact_bookings + dim_customer, dim_destination,<br/>dim_product, dim_date<br/>PK/FK RELY"]
+            LDP["In production: Bronze → Silver → Gold run as one<br/>Lakeflow Declarative Pipeline<br/>(streaming tables + materialized views)"]
+            B --> SV --> G
+            LDP -.-> B
+        end
+
+        subgraph AI["AI enrichment"]
+            direction TB
+            F1["ai_classify<br/>(Foundation Model API)<br/>reads customer_comments"]
+            F2["sentiment + issue_category"]
+            F3["fact_bookings_enriched"]
+            F1 --> F2 --> F3
+        end
+
+        subgraph MV["Metric Views - governed semantic layer"]
+            direction TB
+            M1["mv_bookings<br/>TTV, commission, cancellation rate,<br/>agentic synonyms"]
+            M2["mv_bookings_trends<br/>trailing windows + YoY offset"]
+            M3["mv_bookings_voc<br/>sentiment, TTV at risk"]
+            MN["virtual, computed at query time<br/>always live; optionally materialized"]
+        end
+
+        subgraph CON["Consumption"]
+            direction TB
+            C1["AI/BI Genie<br/>(natural language)"]
+            C2["AI/BI Dashboards"]
+            C3["SQL & Alerts"]
+        end
+
+        SRC -->|"bookings"| LAND
+        LAND -->|"new files"| ING
+        ING -->|"stream"| MED
+        MED -->|"comments"| AI
+        MED -->|"gold tables"| MV
+        AI -->|"enriched"| MV
+        MV ==>|"query"| CON
+    end
+
+    classDef plain fill:#F5F7FA,stroke:#8A94A6,color:#1B1F29
+    classDef accent fill:#FF3621,stroke:#B3200F,color:#FFFFFF,font-weight:bold
+    classDef note fill:#FFF4F2,stroke:#FF3621,color:#1B1F29,stroke-dasharray:4 3
+    class S1,S2,S3,S4,S5,L1,B,SV,F1,F2,M1,M2,M3,C2,C3 plain
+    class A1,G,F3,C1 accent
+    class L2,MN,LDP note
+    style UC fill:#FFFAF9,stroke:#FF3621,stroke-width:2px,color:#1B1F29
+    style SRC fill:#FFFFFF,stroke:#C5CBD6,color:#1B1F29
+    style LAND fill:#FFFFFF,stroke:#C5CBD6,color:#1B1F29
+    style ING fill:#FFFFFF,stroke:#C5CBD6,color:#1B1F29
+    style MED fill:#FFFFFF,stroke:#C5CBD6,color:#1B1F29
+    style AI fill:#FFFFFF,stroke:#C5CBD6,color:#1B1F29
+    style MV fill:#FFFFFF,stroke:#C5CBD6,color:#1B1F29
+    style CON fill:#FFFFFF,stroke:#C5CBD6,color:#1B1F29

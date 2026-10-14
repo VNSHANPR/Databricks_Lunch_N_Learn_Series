@@ -4,6 +4,13 @@
 # MAGIC
 # MAGIC **Session:** Governed Metrics with Unity Catalog Metric Views + AI acceleration
 # MAGIC
+# MAGIC ### The big picture
+# MAGIC Booking data from HTG's retail outlets lands as JSON files; Auto Loader ingests it into a
+# MAGIC Bronze streaming table; the medallion shapes Silver → Gold; `ai_classify` enriches the
+# MAGIC free-text comments; and governed **Metric Views** serve Genie, dashboards and SQL.
+# MAGIC
+# MAGIC ![HTG booking data architecture — retail outlets to JSON files to Auto Loader to Bronze/Silver/Gold medallion to ai_classify enrichment to Unity Catalog Metric Views to Genie, dashboards and SQL](https://vnshanpr.github.io/Databricks_Lunch_N_Learn_Series/metric-views-ai/assets/architecture.png)
+# MAGIC
 # MAGIC This notebook sets up the catalog, schema and data location, then **lands the raw
 # MAGIC bookings with Auto Loader into a streaming Bronze table** — including an incremental
 # MAGIC load so you can watch Auto Loader pick up new files as they arrive. Run it once, top
