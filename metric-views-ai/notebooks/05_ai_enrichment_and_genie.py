@@ -93,15 +93,20 @@ except Exception as e:
 # COMMAND ----------
 
 if AI_OK:
-    # Join labels back onto the fact to produce an enriched gold table.
+    # Join labels back onto the fact to produce an enriched gold table. We also pull
+    # `brand` in from dim_product (brand lives in the dimension, not the fact) so the
+    # Voice-of-Customer metric view below can slice sentiment by brand.
     spark.sql(f"""
         CREATE OR REPLACE TABLE {FQ}.fact_bookings_enriched AS
         SELECT f.*,
+               p.brand,
                COALESCE(l.sentiment, 'No Comment')      AS comment_sentiment,
                COALESCE(l.issue_category, 'No Comment')  AS comment_issue_category
         FROM {FQ}.fact_bookings f
         LEFT JOIN {FQ}.comment_labels l
           ON f.customer_comments = l.customer_comments
+        LEFT JOIN {FQ}.dim_product p
+          ON f.product_id = p.product_id
     """)
 
     spark.sql(f"""
