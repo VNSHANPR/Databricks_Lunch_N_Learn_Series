@@ -95,4 +95,29 @@ display(spark.table(f"{FQ}.bookings_silver").limit(5))
 # COMMAND ----------
 
 # MAGIC %md
+# MAGIC ### 🏭 In production, Silver is a **Streaming Table** too
+# MAGIC
+# MAGIC Here we rebuild Silver with a full `overwrite` each run — simple and deterministic for a
+# MAGIC lab, but it reprocesses *everything* every time and only refreshes when you run the cell.
+# MAGIC In production you make Silver **incremental**: a Streaming Table that reads a **stream**
+# MAGIC from Bronze and applies these same per-row casts/cleaning, so it stays in sync
+# MAGIC automatically — no full recompute. Declaratively (serverless / Lakeflow pipeline):
+# MAGIC
+# MAGIC ```sql
+# MAGIC CREATE OR REFRESH STREAMING TABLE bookings_silver
+# MAGIC   (CONSTRAINT valid_booking EXPECT (booking_id IS NOT NULL) ON VIOLATION DROP ROW)
+# MAGIC AS SELECT
+# MAGIC      booking_id,
+# MAGIC      to_date(booking_date) AS booking_date,
+# MAGIC      CAST(gross_booking_value AS DECIMAL(12,2)) AS gross_booking_value,
+# MAGIC      NULLIF(TRIM(customer_comments), '') AS customer_comments
+# MAGIC      -- …the rest of the columns / casts…
+# MAGIC FROM STREAM(bookings_bronze);
+# MAGIC ```
+# MAGIC
+# MAGIC The full Bronze → Silver → Gold streaming version is in **`06_production_pipeline`**.
+
+# COMMAND ----------
+
+# MAGIC %md
 # MAGIC ✅ Silver is ready. Continue to **`02_build_gold_star_schema`**.
