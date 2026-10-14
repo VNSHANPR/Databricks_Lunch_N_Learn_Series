@@ -9,8 +9,19 @@
 
 # COMMAND ----------
 
-dbutils.widgets.text("catalog", spark.conf.get("htg.catalog", "workspace"), "Catalog")
-dbutils.widgets.text("schema", spark.conf.get("htg.schema", "htg_metric_views_lab"), "Schema")
+# Read the config written by notebook 00 if present (this appendix also runs
+# standalone). Serverless rejects custom spark.conf keys, so we read a JSON file.
+import json
+
+DEFAULT_CATALOG, DEFAULT_SCHEMA = "workspace", "htg_metric_views_lab"
+try:
+    _cfg = json.loads(dbutils.fs.head(
+        f"/Volumes/{DEFAULT_CATALOG}/{DEFAULT_SCHEMA}/raw_files/_htg_config.json"))
+except Exception:
+    _cfg = {}
+
+dbutils.widgets.text("catalog", _cfg.get("htg.catalog", DEFAULT_CATALOG), "Catalog")
+dbutils.widgets.text("schema", _cfg.get("htg.schema", DEFAULT_SCHEMA), "Schema")
 CATALOG = dbutils.widgets.get("catalog").strip()
 SCHEMA = dbutils.widgets.get("schema").strip()
 FQ = f"{CATALOG}.{SCHEMA}"
@@ -50,18 +61,18 @@ dimensions:
 measures:
   - name: Order Count
     expr: COUNT(1)
-    format: {{ type: number, decimal_places: 0 }}
+    format: {{ type: number, decimal_places: {{ type: exact, places: 0 }} }}
   - name: Total Revenue
     expr: SUM(source.o_totalprice)
     synonyms: [revenue, sales, turnover]
-    format: {{ type: currency, currency_code: USD, decimal_places: 0 }}
+    format: {{ type: currency, currency_code: USD, decimal_places: {{ type: exact, places: 0 }} }}
   - name: Revenue per Customer
     expr: SUM(source.o_totalprice) / COUNT(DISTINCT source.o_custkey)
-    format: {{ type: currency, currency_code: USD, decimal_places: 0 }}
+    format: {{ type: currency, currency_code: USD, decimal_places: {{ type: exact, places: 0 }} }}
   - name: Open Order Revenue
     expr: SUM(source.o_totalprice) FILTER (WHERE source.o_orderstatus = 'O')
     comment: "Revenue tied up in open orders"
-    format: {{ type: currency, currency_code: USD, decimal_places: 0 }}
+    format: {{ type: currency, currency_code: USD, decimal_places: {{ type: exact, places: 0 }} }}
 $$
 """)
 print("Created", f"{FQ}.mv_tpch_orders")

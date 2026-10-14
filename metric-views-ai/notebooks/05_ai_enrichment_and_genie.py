@@ -15,8 +15,19 @@
 
 # COMMAND ----------
 
-dbutils.widgets.text("catalog", spark.conf.get("htg.catalog", "workspace"), "Catalog")
-dbutils.widgets.text("schema", spark.conf.get("htg.schema", "htg_metric_views_lab"), "Schema")
+# Read the config written by notebook 00. Serverless rejects custom spark.conf
+# keys, so cross-notebook state travels through a JSON file on the lab Volume.
+import json
+
+DEFAULT_CATALOG, DEFAULT_SCHEMA = "workspace", "htg_metric_views_lab"
+try:
+    _cfg = json.loads(dbutils.fs.head(
+        f"/Volumes/{DEFAULT_CATALOG}/{DEFAULT_SCHEMA}/raw_files/_htg_config.json"))
+except Exception:
+    _cfg = {}
+
+dbutils.widgets.text("catalog", _cfg.get("htg.catalog", DEFAULT_CATALOG), "Catalog")
+dbutils.widgets.text("schema", _cfg.get("htg.schema", DEFAULT_SCHEMA), "Schema")
 CATALOG = dbutils.widgets.get("catalog").strip()
 SCHEMA = dbutils.widgets.get("schema").strip()
 FQ = f"{CATALOG}.{SCHEMA}"
@@ -104,18 +115,18 @@ if AI_OK:
         measures:
           - name: Booking Count
             expr: COUNT(1)
-            format: {{ type: number, decimal_places: 0 }}
+            format: {{ type: number, decimal_places: {{ type: exact, places: 0 }} }}
           - name: Negative Comment Rate
             expr: COUNT(1) FILTER (WHERE comment_sentiment = 'Negative') * 1.0
                   / NULLIF(COUNT(1) FILTER (WHERE comment_sentiment <> 'No Comment'), 0)
             comment: "Share of commented bookings with negative sentiment"
             synonyms: [negative rate, detractor rate, complaint rate]
-            format: {{ type: percent, decimal_places: 1 }}
+            format: {{ type: percentage, decimal_places: {{ type: exact, places: 1 }} }}
           - name: TTV at Risk
             expr: SUM(gross_booking_value) FILTER (WHERE comment_sentiment = 'Negative')
             comment: "TTV associated with negative-sentiment bookings"
             synonyms: [revenue at risk, TTV at risk]
-            format: {{ type: currency, currency_code: AUD, decimal_places: 0 }}
+            format: {{ type: currency, currency_code: AUD, decimal_places: {{ type: exact, places: 0 }} }}
         $$
     """)
     print("Created", f"{FQ}.mv_bookings_voc")

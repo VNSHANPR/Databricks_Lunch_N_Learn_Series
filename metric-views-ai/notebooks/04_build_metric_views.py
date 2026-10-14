@@ -11,8 +11,19 @@
 
 # COMMAND ----------
 
-dbutils.widgets.text("catalog", spark.conf.get("htg.catalog", "workspace"), "Catalog")
-dbutils.widgets.text("schema", spark.conf.get("htg.schema", "htg_metric_views_lab"), "Schema")
+# Read the config written by notebook 00. Serverless rejects custom spark.conf
+# keys, so cross-notebook state travels through a JSON file on the lab Volume.
+import json
+
+DEFAULT_CATALOG, DEFAULT_SCHEMA = "workspace", "htg_metric_views_lab"
+try:
+    _cfg = json.loads(dbutils.fs.head(
+        f"/Volumes/{DEFAULT_CATALOG}/{DEFAULT_SCHEMA}/raw_files/_htg_config.json"))
+except Exception:
+    _cfg = {}
+
+dbutils.widgets.text("catalog", _cfg.get("htg.catalog", DEFAULT_CATALOG), "Catalog")
+dbutils.widgets.text("schema", _cfg.get("htg.schema", DEFAULT_SCHEMA), "Schema")
 CATALOG = dbutils.widgets.get("catalog").strip()
 SCHEMA = dbutils.widgets.get("schema").strip()
 FQ = f"{CATALOG}.{SCHEMA}"
@@ -102,7 +113,9 @@ measures:
     synonyms: [bookings, number of bookings, volume]
     format:
       type: number
-      decimal_places: 0
+      decimal_places:
+        type: exact
+        places: 0
 
   - name: Total TTV
     expr: SUM(source.gross_booking_value)
@@ -111,7 +124,9 @@ measures:
     format:
       type: currency
       currency_code: AUD
-      decimal_places: 0
+      decimal_places:
+        type: exact
+        places: 0
 
   - name: Total Commission
     expr: SUM(source.commission_amount)
@@ -120,7 +135,9 @@ measures:
     format:
       type: currency
       currency_code: AUD
-      decimal_places: 0
+      decimal_places:
+        type: exact
+        places: 0
 
   # --- Filtered measures ---
   - name: Cancelled Bookings
@@ -129,15 +146,19 @@ measures:
     synonyms: [cancellations]
     format:
       type: number
-      decimal_places: 0
+      decimal_places:
+        type: exact
+        places: 0
 
   - name: Cancellation Rate
     expr: COUNT(1) FILTER (WHERE source.booking_status = 'Cancelled') * 1.0 / COUNT(1)
     comment: "Share of bookings cancelled"
     synonyms: [cancel rate, cancellation %]
     format:
-      type: percent
-      decimal_places: 1
+      type: percentage
+      decimal_places:
+        type: exact
+        places: 1
 
   - name: Refund Exposure
     expr: SUM(source.refund_amount)
@@ -146,7 +167,9 @@ measures:
     format:
       type: currency
       currency_code: AUD
-      decimal_places: 0
+      decimal_places:
+        type: exact
+        places: 0
 
   # --- Ratio measures (re-aggregate safely) ---
   - name: Average Booking Value
@@ -156,15 +179,19 @@ measures:
     format:
       type: currency
       currency_code: AUD
-      decimal_places: 0
+      decimal_places:
+        type: exact
+        places: 0
 
   - name: Commission Rate
     expr: SUM(source.commission_amount) / NULLIF(SUM(source.gross_booking_value), 0)
     comment: "Commission as a percentage of TTV — HTG's effective margin"
     synonyms: [margin rate, take rate, commission %]
     format:
-      type: percent
-      decimal_places: 1
+      type: percentage
+      decimal_places:
+        type: exact
+        places: 1
 
   - name: Active Customers
     expr: COUNT(DISTINCT source.customer_id)
@@ -172,19 +199,27 @@ measures:
     synonyms: [unique customers, customer count]
     format:
       type: number
-      decimal_places: 0
+      decimal_places:
+        type: exact
+        places: 0
 $$
 """
 try:
     spark.sql(mv_bookings)
     print("Created metric view:", f"{FQ}.mv_bookings")
 except Exception as e:
+    msg = str(e)
     print("⚠️  Could not create the metric view.")
-    print("   If the error is METRIC_VIEW_INVALID_VIEW_DEFINITION / 'Failed to parse YAML',")
-    print("   your compute is below DBR 16.4 — metric views need 16.4+ (17.2+ recommended).")
-    print("   Fix: attach this notebook to serverless notebook compute (current runtime), or use")
-    print("   a SQL warehouse on the Current/Preview channel, then re-run. (Validated on DBR 18.2.)")
-    print("   Detail:", str(e)[:200])
+    if "Failed to parse YAML" in msg or "INVALID_VIEW_DEFINITION" in msg:
+        print("   The YAML failed validation. The usual culprits are in a `format` block:")
+        print("   • decimal_places must be an OBJECT, not a bare integer —")
+        print("     decimal_places: {type: exact, places: N}")
+        print("   • the percent format type is spelled `percentage`, not `percent`")
+    if "PARSE_SYNTAX_ERROR" in msg or "Unsupported" in msg:
+        print("   If instead it's a syntax/unsupported error, your compute may be below")
+        print("   DBR 16.4 — metric views need 16.4+ (17.2+ recommended). Use serverless")
+        print("   notebook compute (current runtime), or a SQL warehouse on Current/Preview.")
+    print("   Detail:", msg[:300])
     raise
 
 # COMMAND ----------
@@ -285,8 +320,10 @@ measures:
     comment: "Year-over-year TTV growth"
     synonyms: [YoY growth, year on year growth]
     format:
-      type: percent
-      decimal_places: 1
+      type: percentage
+      decimal_places:
+        type: exact
+        places: 1
 $$
 """
 try:
@@ -300,8 +337,10 @@ except Exception as e:
 
 # COMMAND ----------
 
-# Year-over-year TTV by month (only runs if the trends view was created above)
-if spark.catalog.tableExists(f"{FQ}.mv_bookings_trends"):
+# Year-over-year TTV by month (only runs if the trends view was created above).
+# Note: spark.catalog.tableExists() isn't available on serverless (Spark Connect),
+# so we just try the query and fall back to a message if the view isn't there.
+try:
     display(spark.sql(f"""
       SELECT
         `Booking Month`,
@@ -313,8 +352,8 @@ if spark.catalog.tableExists(f"{FQ}.mv_bookings_trends"):
       GROUP BY ALL
       ORDER BY `Booking Month`
     """))
-else:
-    print("Trends view not created (needs DBR 18.0+). Skipping YoY query.")
+except Exception:
+    print("Trends view not available (needs DBR 18.0+). Skipping YoY query.")
 
 # COMMAND ----------
 

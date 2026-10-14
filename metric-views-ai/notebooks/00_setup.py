@@ -48,7 +48,13 @@ spark.sql(f"CREATE SCHEMA IF NOT EXISTS {FQ}")
 spark.sql(f"USE CATALOG {CATALOG}")
 spark.sql(f"USE SCHEMA {SCHEMA}")
 print(f"Using {FQ}")
-print("Databricks Runtime:", spark.conf.get("spark.databricks.clusterUsageTags.sparkVersion", "serverless / unknown"))
+# On serverless, cluster-tag confs aren't exposed and spark.conf.get() raises
+# CONFIG_NOT_AVAILABLE (the default arg doesn't help) — so guard it.
+try:
+    _runtime = spark.conf.get("spark.databricks.clusterUsageTags.sparkVersion")
+except Exception:
+    _runtime = "serverless / current"
+print("Databricks Runtime:", _runtime)
 
 # COMMAND ----------
 
@@ -107,11 +113,19 @@ else:
 
 # COMMAND ----------
 
-# Stash config for the other notebooks via the Spark conf (simple cross-notebook state).
-spark.conf.set("htg.catalog", CATALOG)
-spark.conf.set("htg.schema", SCHEMA)
+# Stash config for the other notebooks. On serverless compute, spark.conf.set()
+# rejects custom keys (CONFIG_NOT_AVAILABLE), so it can't carry cross-notebook state.
+# Instead we write a small JSON file to the lab Volume; the other notebooks read it
+# back. (This also works on classic compute.)
+import json
+
+config = {"htg.catalog": CATALOG, "htg.schema": SCHEMA}
 if CSV_PATH:
-    spark.conf.set("htg.csv_path", CSV_PATH)
+    config["htg.csv_path"] = CSV_PATH
+
+CONFIG_PATH = f"{VOLUME_PATH}/_htg_config.json"
+dbutils.fs.put(CONFIG_PATH, json.dumps(config), overwrite=True)
+print("Wrote lab config to", CONFIG_PATH)
 
 # COMMAND ----------
 

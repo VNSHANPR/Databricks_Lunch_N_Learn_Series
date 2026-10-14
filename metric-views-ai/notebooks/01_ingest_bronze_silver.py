@@ -8,8 +8,19 @@
 
 # COMMAND ----------
 
-dbutils.widgets.text("catalog", spark.conf.get("htg.catalog", "workspace"), "Catalog")
-dbutils.widgets.text("schema", spark.conf.get("htg.schema", "htg_metric_views_lab"), "Schema")
+# Read the config written by notebook 00. Serverless rejects custom spark.conf
+# keys, so cross-notebook state travels through a JSON file on the lab Volume.
+import json, os
+
+DEFAULT_CATALOG, DEFAULT_SCHEMA = "workspace", "htg_metric_views_lab"
+try:
+    _cfg = json.loads(dbutils.fs.head(
+        f"/Volumes/{DEFAULT_CATALOG}/{DEFAULT_SCHEMA}/raw_files/_htg_config.json"))
+except Exception:
+    _cfg = {}
+
+dbutils.widgets.text("catalog", _cfg.get("htg.catalog", DEFAULT_CATALOG), "Catalog")
+dbutils.widgets.text("schema", _cfg.get("htg.schema", DEFAULT_SCHEMA), "Schema")
 CATALOG = dbutils.widgets.get("catalog").strip()
 SCHEMA = dbutils.widgets.get("schema").strip()
 FQ = f"{CATALOG}.{SCHEMA}"
@@ -17,8 +28,7 @@ spark.sql(f"USE CATALOG {CATALOG}")
 spark.sql(f"USE SCHEMA {SCHEMA}")
 
 # Resolve the CSV path saved by notebook 00 (fall back to the usual repo location).
-import os
-CSV_PATH = spark.conf.get("htg.csv_path", "")
+CSV_PATH = _cfg.get("htg.csv_path", "")
 if not CSV_PATH:
     guess = os.path.abspath(os.path.join(os.getcwd(), "..", "data", "htg_bookings_raw.csv"))
     CSV_PATH = guess if os.path.exists(guess) else f"/Volumes/{CATALOG}/{SCHEMA}/raw_files/htg_bookings_raw.csv"
