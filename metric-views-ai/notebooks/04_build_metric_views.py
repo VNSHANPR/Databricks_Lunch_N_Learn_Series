@@ -11,24 +11,40 @@
 
 # COMMAND ----------
 
-# Read the config written by notebook 00. Serverless rejects custom spark.conf
-# keys, so cross-notebook state travels through a JSON file on the lab Volume.
+# Catalog & schema are chosen ONCE in notebook 00 (its widgets) and recorded in a small
+# JSON config on the lab Volume. Downstream notebooks READ that config — they define no
+# catalog/schema of their own, so there's nothing to keep in sync. We locate the config by
+# scanning the catalogs you can see for the lab schema's config file.
 import json
 
-DEFAULT_CATALOG, DEFAULT_SCHEMA = "workspace", "htg_metric_views_lab"
-try:
-    _cfg = json.loads(dbutils.fs.head(
-        f"/Volumes/{DEFAULT_CATALOG}/{DEFAULT_SCHEMA}/raw_files/_htg_config.json"))
-except Exception:
-    _cfg = {}
+LAB_SCHEMA = "htg_metric_views_lab"   # lab's fixed schema name — used only to locate 00's config
 
-dbutils.widgets.text("catalog", _cfg.get("htg.catalog", DEFAULT_CATALOG), "Catalog")
-dbutils.widgets.text("schema", _cfg.get("htg.schema", DEFAULT_SCHEMA), "Schema")
-CATALOG = dbutils.widgets.get("catalog").strip()
-SCHEMA = dbutils.widgets.get("schema").strip()
+def _read_lab_cfg():
+    cats = []
+    try:
+        cats.append(spark.sql("SELECT current_catalog()").first()[0])
+    except Exception:
+        pass
+    try:
+        cats += [r[0] for r in spark.sql("SHOW CATALOGS").collect()]
+    except Exception:
+        pass
+    for cat in dict.fromkeys(cats):
+        try:
+            return json.loads(dbutils.fs.head(
+                f"/Volumes/{cat}/{LAB_SCHEMA}/raw_files/_htg_config.json"))
+        except Exception:
+            continue
+    return None
+
+_cfg = _read_lab_cfg()
+assert _cfg, ("Lab config not found — run 00_setup first. It picks the catalog/schema and "
+              "writes _htg_config.json on the lab Volume, which every downstream notebook reads.")
+CATALOG, SCHEMA = _cfg["htg.catalog"], _cfg["htg.schema"]
 FQ = f"{CATALOG}.{SCHEMA}"
 spark.sql(f"USE CATALOG {CATALOG}")
 spark.sql(f"USE SCHEMA {SCHEMA}")
+print(f"Using {FQ} (from 00_setup config)")
 
 # COMMAND ----------
 
