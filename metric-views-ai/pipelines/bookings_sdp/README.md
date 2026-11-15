@@ -24,13 +24,16 @@ databricks bundle validate --profile <PROFILE>
 databricks bundle deploy   --profile <PROFILE> # dev target (default)
 databricks bundle run bookings_sdp --profile <PROFILE>
 ```
-Override the defaults per workspace if needed:
+Override the defaults for your workspace + catalog (set these once):
 ```bash
-databricks bundle deploy --profile <PROFILE> \
-  --var="catalog=workspace" \
+export PROFILE=<your-profile>     # the workspace, e.g. free-edition OR fevm-de-cert-classic
+export CATALOG=<your-catalog>     # Free Edition: workspace OR e.g. de_cert_classic_catalog
+databricks bundle deploy --profile "$PROFILE" \
+  --var="catalog=$CATALOG" \
   --var="target_schema=htg_metric_views_lab_prod" \
-  --var="landing_path=/Volumes/workspace/htg_metric_views_lab/raw_files/landing"
+  --var="landing_path=/Volumes/$CATALOG/htg_metric_views_lab/raw_files/landing"
 ```
+> Full step-by-step (install CLI, create profile, land data, verify) is in [../../DEPLOY.md](../../DEPLOY.md).
 
 ## Or create it in the UI
 **Jobs & Pipelines → Create → ETL pipeline** → Serverless → add all files under

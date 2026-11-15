@@ -37,13 +37,22 @@ payment_issue, delay_or_disruption, loyalty_points, complaint, compliment, other
    (creates the Volume, copies the WAVs to `landing/`, builds the `conversations` table).
 3. **`notebooks/01_try_ai_transcribe`** — see one call transcribed + a one-shot sentiment/
    classify/summarize preview. This also prints the real `ai_transcribe` result schema.
-4. **Deploy & run the pipeline:**
+4. **Deploy & run the pipeline** (set your workspace + catalog once):
    ```bash
+   export PROFILE=<your-profile>     # free-edition OR fevm-de-cert-classic ...
+   export CATALOG=<your-catalog>     # workspace OR de_cert_classic_catalog ...
    cd pipelines/voc_sdp
-   databricks bundle validate --profile <PROFILE>
-   databricks bundle deploy   --profile <PROFILE>
-   databricks bundle run voc_sdp --profile <PROFILE>
+   databricks bundle validate --profile "$PROFILE" --var="catalog=$CATALOG"
+   databricks bundle deploy   --profile "$PROFILE" \
+     --var="catalog=$CATALOG" \
+     --var="recordings_path=/Volumes/$CATALOG/htg_voc_lab/call_recordings/landing" \
+     --var="metadata_table=$CATALOG.htg_voc_lab.conversations"
+   databricks bundle run voc_sdp --profile "$PROFILE" \
+     --var="catalog=$CATALOG" \
+     --var="recordings_path=/Volumes/$CATALOG/htg_voc_lab/call_recordings/landing" \
+     --var="metadata_table=$CATALOG.htg_voc_lab.conversations"
    ```
+   > Full step-by-step is in [../DEPLOY.md](../DEPLOY.md).
    (or build it in the UI: **Jobs & Pipelines → Create → ETL pipeline**, serverless, point at
    `transformations/`, set `recordings_path` + `metadata_table` config.)
 5. **Explore `call_insights`** — point a **Genie space** or an **AI/BI dashboard** at it

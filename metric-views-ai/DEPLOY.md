@@ -1,135 +1,153 @@
-# Deploy guide — run these pipelines on a fresh Databricks workspace
+# Deploy guide — run these pipelines on any Databricks workspace
 
-End-to-end instructions to deploy both pipelines yourself on a brand-new **Databricks Free
-Edition** workspace using a **local CLI profile** + **Asset Bundles**.
+End-to-end instructions to deploy both pipelines yourself using a **local CLI profile** +
+**Asset Bundles**. Works on **Free Edition** (catalog `workspace`) or any other workspace
+(e.g. a shared workspace where your catalog is `main`, `de_cert_classic_catalog`, etc.) — you
+just set two values once and every command below uses them.
 
 - **Part 1 — `pipelines/bookings_sdp/`**: Auto Loader → Bronze → Silver → Gold (bookings), with expectations.
 - **Part 2 — `voice-of-customer/`**: call recordings → `ai_transcribe` → `ai_classify`/sentiment/summarize.
 
-Everything is serverless and uses the `workspace` catalog by default (the Free Edition default).
+Everything is serverless.
 
 ---
 
 ## 0. Prerequisites (one-time)
 
-### a. Create a Free Edition workspace
-Sign up at **https://www.databricks.com/learn/free-edition** and note your workspace URL, e.g.
-`https://dbc-xxxxxxxx-xxxx.cloud.databricks.com`. Free Edition is serverless with Unity Catalog
-enabled (default catalog is `workspace`).
+### a. Create / pick a workspace
+- **Free Edition:** sign up at https://www.databricks.com/learn/free-edition and note the URL
+  (serverless + Unity Catalog, default catalog `workspace`).
+- **Any other workspace:** just note its URL and a Unity Catalog you can `CREATE` in.
 
 ### b. Install the Databricks CLI (v0.292.0+)
 ```bash
-# macOS (Homebrew)
-brew tap databricks/tap && brew install databricks
-# or the universal installer
-curl -fsSL https://raw.githubusercontent.com/databricks/setup-cli/main/install.sh | sh
+brew tap databricks/tap && brew install databricks      # macOS
+# or: curl -fsSL https://raw.githubusercontent.com/databricks/setup-cli/main/install.sh | sh
 databricks --version        # must be >= 0.292.0
 ```
 
 ### c. Create a local profile (OAuth browser login)
+Give the profile any name you like — that name IS how you select the workspace later.
 ```bash
 databricks auth login \
-  --host https://dbc-xxxxxxxx-xxxx.cloud.databricks.com \
-  --profile free-edition
-# A browser opens — approve. Then verify:
-databricks auth profiles
-databricks current-user me --profile free-edition
+  --host https://<your-workspace>.cloud.databricks.com \
+  --profile <your-profile-name>
 ```
 
-### d. Get the repo in two places
+### d. ⭐ Set YOUR workspace + catalog (every command below reads these)
+Run these two `export`s in your terminal. **This is where you "enter" the workspace and
+catalog** — change them to match what you created/chose above:
 ```bash
-# 1) Local clone — the CLI deploys the bundles FROM here
-git clone https://github.com/VNSHANPR/Databricks_Lunch_N_Learn_Series.git
+export PROFILE=<your-profile-name>     # the workspace, e.g. free-edition  OR  fevm-de-cert-classic
+export CATALOG=<your-catalog>          # Free Edition: workspace          OR  e.g. de_cert_classic_catalog
+```
+Verify they work:
+```bash
+databricks current-user me --profile "$PROFILE"
+databricks catalogs list --profile "$PROFILE"     # confirm $CATALOG is in the list
+```
+
+### e. Get the repo in two places
+```bash
+git clone https://github.com/VNSHANPR/Databricks_Lunch_N_Learn_Series.git   # local, for bundle deploy
 cd Databricks_Lunch_N_Learn_Series/metric-views-ai
 ```
-```text
-# 2) Workspace Git folder — so the NOTEBOOKS can see the committed WAVs/CSVs.
-#    In the workspace UI: Workspace → (your home) → Create → Git folder →
-#    URL: https://github.com/VNSHANPR/Databricks_Lunch_N_Learn_Series.git → Create.
-```
-
-> Everywhere below, replace `<PROFILE>` with `free-edition`.
+Also add the repo as a **Git folder in the workspace UI** (Workspace → Create → Git folder →
+the repo URL) so the notebooks can see the committed WAVs.
 
 ---
 
 ## Part 1 — Bookings medallion pipeline
 
 ### 1. Land the raw files (once)
-In the workspace Git folder, open **`metric-views-ai/notebooks/00_setup`** and run
-**sections 1–3** (serverless). This creates the `raw_files` Volume and fills
-`/Volumes/workspace/htg_metric_views_lab/raw_files/landing/` with JSON — the folder the
-pipeline watches.
+In the workspace, open **`metric-views-ai/notebooks/00_setup`**, set its **`catalog` widget to
+your `$CATALOG`**, and run **sections 1–3**. That creates the `raw_files` Volume and fills
+`/Volumes/$CATALOG/htg_metric_views_lab/raw_files/landing/` with JSON.
 
-### 2. Deploy & run the pipeline
+### 2. Deploy & run
 ```bash
 cd metric-views-ai/pipelines/bookings_sdp
-databricks bundle validate --profile <PROFILE>
-databricks bundle deploy   --profile <PROFILE>        # creates the pipeline (dev target)
-databricks bundle run bookings_sdp --profile <PROFILE>
-```
-Override defaults if your catalog/schema/landing path differ:
-```bash
-databricks bundle deploy --profile <PROFILE> \
-  --var="catalog=workspace" \
+
+databricks bundle validate --profile "$PROFILE" --var="catalog=$CATALOG"
+
+databricks bundle deploy --profile "$PROFILE" \
+  --var="catalog=$CATALOG" \
   --var="target_schema=htg_metric_views_lab_prod" \
-  --var="landing_path=/Volumes/workspace/htg_metric_views_lab/raw_files/landing"
+  --var="landing_path=/Volumes/$CATALOG/htg_metric_views_lab/raw_files/landing"
+
+databricks bundle run bookings_sdp --profile "$PROFILE" \
+  --var="catalog=$CATALOG" \
+  --var="target_schema=htg_metric_views_lab_prod" \
+  --var="landing_path=/Volumes/$CATALOG/htg_metric_views_lab/raw_files/landing"
 ```
+> Pass the **same `--var`s** to `deploy` and `run`. (On Free Edition `$CATALOG=workspace` the
+> defaults already match, so you can drop the flags there.)
 
 ### 3. Verify
-- **Jobs & Pipelines** → open `htg-bookings-medallion` → the graph shows
-  `bookings_bronze → bookings_silver → fact_bookings` + `dim_*`.
-- Open the **Data quality** tab to see the Silver expectations (kept/dropped counts).
-- Point `notebooks/04_build_metric_views` at `target_schema` to read the pipeline's Gold.
+- **Jobs & Pipelines → `htg-bookings-medallion`**: graph `bookings_bronze → bookings_silver →
+  fact_bookings` + `dim_*`; check the **Data quality** tab for the Silver expectations.
+- Point `notebooks/04_build_metric_views` at `$CATALOG` / `htg_metric_views_lab_prod`.
 
 ---
 
 ## Part 2 — Voice-of-Customer pipeline
 
 ### 1. Land the recordings + metadata (once)
-In the workspace Git folder, run **`metric-views-ai/voice-of-customer/notebooks/00_setup_upload`**
-(serverless). It creates the `call_recordings` Volume, copies the 6 WAVs into `landing/`, and
-builds the `conversations` table. Then run **`01_try_ai_transcribe`** to confirm `ai_transcribe`
-is enabled in your region (it's Beta) and to see the transcript shape.
+In the workspace, run **`voice-of-customer/notebooks/00_setup_upload`** with its **`catalog`
+widget set to `$CATALOG`** (creates the `call_recordings` Volume, copies the 6 WAVs to
+`landing/`, builds `conversations`). Then run **`01_try_ai_transcribe`** to confirm
+`ai_transcribe` is enabled (Beta) and see the transcript shape.
+> If `ai_transcribe` is unavailable, use `voice-of-customer/data/ground_truth.csv` as the
+> transcript source — only the Silver step changes.
 
-> If `ai_transcribe` is NOT available, use `voice-of-customer/data/ground_truth.csv` as the
-> transcript source — only the Silver step changes; classify/summarize are identical.
-
-### 2. Deploy & run the pipeline
+### 2. Deploy & run
 ```bash
 cd metric-views-ai/voice-of-customer/pipelines/voc_sdp
-databricks bundle validate --profile <PROFILE>
-databricks bundle deploy   --profile <PROFILE>
-databricks bundle run voc_sdp --profile <PROFILE>
-```
-Override defaults if needed:
-```bash
-databricks bundle deploy --profile <PROFILE> \
-  --var="catalog=workspace" \
+
+databricks bundle validate --profile "$PROFILE" --var="catalog=$CATALOG"
+
+databricks bundle deploy --profile "$PROFILE" \
+  --var="catalog=$CATALOG" \
   --var="target_schema=htg_voc_lab" \
-  --var="recordings_path=/Volumes/workspace/htg_voc_lab/call_recordings/landing" \
-  --var="metadata_table=workspace.htg_voc_lab.conversations"
+  --var="recordings_path=/Volumes/$CATALOG/htg_voc_lab/call_recordings/landing" \
+  --var="metadata_table=$CATALOG.htg_voc_lab.conversations"
+
+databricks bundle run voc_sdp --profile "$PROFILE" \
+  --var="catalog=$CATALOG" \
+  --var="target_schema=htg_voc_lab" \
+  --var="recordings_path=/Volumes/$CATALOG/htg_voc_lab/call_recordings/landing" \
+  --var="metadata_table=$CATALOG.htg_voc_lab.conversations"
 ```
 
 ### 3. Verify
 - Pipeline graph: `loaded_audio_files → call_transcripts → call_insights`.
-- `SELECT call_reason, sentiment, summary, transcript_text FROM workspace.htg_voc_lab.call_insights`.
-- Point a **Genie space** or **AI/BI dashboard** at `call_insights`.
+- `SELECT call_reason, sentiment, summary, transcript_text FROM $CATALOG.htg_voc_lab.call_insights`.
+- Point a **Genie space** / **AI-BI dashboard** at `call_insights`.
 
 ---
 
+## Quick copy-paste (example: de-cert-classic)
+```bash
+export PROFILE=fevm-de-cert-classic
+export CATALOG=de_cert_classic_catalog
+# then run the Part 1 / Part 2 blocks above as-is
+```
+
 ## Test checklist
-- [ ] `databricks current-user me --profile free-edition` returns your user.
-- [ ] Notebook `00_setup` sections 1–3 ran; `landing/` has JSON files.
+- [ ] `databricks current-user me --profile "$PROFILE"` returns your user; `$CATALOG` is in `catalogs list`.
+- [ ] Notebook `00_setup` (sections 1–3) ran with the `catalog` widget = `$CATALOG`; `landing/` has JSON.
 - [ ] `bundle validate` passes for `bookings_sdp`; `bundle run` completes; graph is green.
-- [ ] `00_setup_upload` ran; `call_recordings/landing/` has 6 WAVs; `conversations` has 6 rows.
-- [ ] `01_try_ai_transcribe` prints a transcript (or you switch to the ground-truth fallback).
+- [ ] `00_setup_upload` ran (catalog widget = `$CATALOG`); 6 WAVs in `landing/`; `conversations` has 6 rows.
+- [ ] `01_try_ai_transcribe` prints a transcript (or switch to the ground-truth fallback).
 - [ ] `bundle validate` passes for `voc_sdp`; `bundle run` completes; `call_insights` has 6 rows.
 
 ## Troubleshooting
 | Symptom | Fix |
 |---|---|
-| `bundle validate` can't resolve host | Pass `--profile <PROFILE>`; or add `workspace: {host: https://...}` under the `dev` target. |
+| `CATALOG_DOES_NOT_EXIST` on deploy | `$CATALOG` doesn't exist in that workspace. Run `databricks catalogs list --profile "$PROFILE"` and set `CATALOG` to a real one (Free Edition = `workspace`; de-cert-classic = `de_cert_classic_catalog`). |
+| `bundle validate` can't resolve host | Make sure `--profile "$PROFILE"` is set; the profile supplies the host. |
 | CLI too old / command missing | Upgrade to >= 0.292.0 (step 0b). |
 | `ai_transcribe` not found / errors | Beta + region-gated — use the `ground_truth.csv` fallback (notebook 01 explains). |
-| Notebook 00 can't find the WAVs | Make sure you cloned the repo as a **Git folder** in the workspace (step 0d-2), not just locally. |
+| Notebook 00 can't find the WAVs | Clone the repo as a **Git folder** in the workspace (step 0e), not just locally. |
 | Pipeline stuck INITIALIZING | Normal cold start for serverless — wait a few minutes. |
+| Table/volume not found at `run` | Run the setup notebook first with its `catalog` widget set to `$CATALOG`. |
