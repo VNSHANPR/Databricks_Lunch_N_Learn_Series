@@ -1,0 +1,14 @@
+resources:
+  pipelines:
+    bookings_sdp:
+      name: htg-bookings-medallion
+      serverless: true
+      catalog: ${var.catalog}
+      schema: ${var.target_schema}
+      # All .sql files under transformations/ are one dependency graph:
+      #   01_ingestion (Bronze) → 02_silver (Silver) → 03_prod (Gold).
+      libraries:
+        - glob:
+            include: transformations/**
+      configuration:
+        landing_path: ${var.landing_path}

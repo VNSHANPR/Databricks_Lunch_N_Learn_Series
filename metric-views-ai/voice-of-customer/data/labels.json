@@ -1,0 +1,12 @@
+[
+  "new_booking_enquiry",
+  "booking_change",
+  "cancellation",
+  "refund_request",
+  "payment_issue",
+  "delay_or_disruption",
+  "loyalty_points",
+  "complaint",
+  "compliment",
+  "other"
+]

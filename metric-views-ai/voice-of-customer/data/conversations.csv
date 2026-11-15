@@ -1,0 +1,7 @@
+call_id,audio_file,agent_id,agent_name,queue,channel,call_start_ts,duration_seconds,customer_id
+CALL-0001,call_0001.wav,A-204,Priya Sharma,Leisure Support,Phone,2026-11-14 09:05:00,105,C-88213
+CALL-0002,call_0002.wav,A-118,Daniel Lee,Leisure Support,Phone,2026-11-14 09:42:00,105,C-45190
+CALL-0003,call_0003.wav,A-307,Karen Mitchell,Urgent Assist,Phone,2026-11-14 10:19:00,105,C-77654
+CALL-0004,call_0004.wav,A-512,Tom Nguyen,New Sales,Phone,2026-11-14 10:56:00,105,C-10022
+CALL-0005,call_0005.wav,A-260,Aisha Khan,Member Services,Phone,2026-11-14 11:33:00,105,C-33771
+CALL-0006,call_0006.wav,A-204,Priya Sharma,Leisure Support,Phone,2026-11-14 12:10:00,93,C-60918

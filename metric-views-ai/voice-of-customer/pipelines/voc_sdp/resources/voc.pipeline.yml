@@ -1,0 +1,13 @@
+resources:
+  pipelines:
+    voc_sdp:
+      name: htg-voice-of-customer
+      serverless: true
+      catalog: ${var.catalog}
+      schema: ${var.target_schema}
+      libraries:
+        - glob:
+            include: transformations/**
+      configuration:
+        recordings_path: ${var.recordings_path}
+        metadata_table: ${var.metadata_table}
