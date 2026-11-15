@@ -61,7 +61,7 @@ spark.sql(f"""
       SELECT parse_json(to_json(ai_transcribe(content))) AS v
       FROM read_files('{ONE_FILE}', format => 'binaryFile')
     )
-    -- ai_transcribe returns {response:{segments:[{speaker_id,start,end,text}]}} — join segment texts.
+    -- ai_transcribe nests the transcript under response.segments[].text — join the segment texts.
     SELECT COALESCE(
              array_join(transform(try_cast(v:response:segments AS ARRAY<VARIANT>), s -> s:text::string), ' '),
              v:response:text::string,
