@@ -8,7 +8,8 @@ resources:
       # All .sql files under transformations/ are one dependency graph:
       #   01_ingestion (Bronze) → 02_silver (Silver) → 03_prod (Gold).
       libraries:
+        # glob is resolved relative to THIS resource file (in resources/), so step up to the bundle root
         - glob:
-            include: transformations/**
+            include: ../transformations/**
       configuration:
         landing_path: ${var.landing_path}
