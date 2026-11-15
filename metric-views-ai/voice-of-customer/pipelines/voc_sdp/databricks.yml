@@ -13,7 +13,7 @@ bundle:
 
 variables:
   catalog:
-    description: Unity Catalog to publish into (Free Edition: usually `workspace`).
+    description: "Unity Catalog to publish into (Free Edition: usually `workspace`)."
     default: workspace
   target_schema:
     description: Schema for the pipeline tables. Keep it the same as notebook 00 so `conversations` resolves.
