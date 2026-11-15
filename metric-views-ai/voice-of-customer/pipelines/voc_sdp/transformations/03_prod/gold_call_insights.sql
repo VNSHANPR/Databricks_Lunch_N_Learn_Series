@@ -4,7 +4,7 @@
 -- per transcript (streaming table) and the result is joined to the call metadata
 -- table built by notebook 00 (`${metadata_table}`). This is the business-ready table
 -- to point a Genie space or an AI/BI dashboard at.
---   ai_classify returns VARIANT → read the chosen label with :response[0].
+--   ai_classify(text, ARRAY(labels)) returns the chosen label as a plain STRING here.
 -- ============================================================================
 CREATE OR REFRESH STREAMING TABLE call_insights
   COMMENT 'Gold — one row per call: transcript + sentiment + call reason + summary + metadata.'
@@ -25,7 +25,7 @@ AS SELECT
        ARRAY('new_booking_enquiry','booking_change','cancellation','refund_request',
              'payment_issue','delay_or_disruption','loyalty_points','complaint',
              'compliment','other')
-     ):response[0]::string AS call_reason,
+     ) AS call_reason,
      ai_summarize(t.transcript_text, 25) AS summary
 FROM STREAM(call_transcripts) t
 LEFT JOIN ${metadata_table} c

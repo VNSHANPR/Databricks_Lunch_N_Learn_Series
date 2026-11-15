@@ -61,11 +61,11 @@ spark.sql(f"""
       SELECT parse_json(to_json(ai_transcribe(content))) AS v
       FROM read_files('{ONE_FILE}', format => 'binaryFile')
     )
+    -- ai_transcribe returns {response:{segments:[{speaker_id,start,end,text}]}} — join segment texts.
     SELECT COALESCE(
-             v:text::string,
-             v:transcription::string,
-             array_join(transform(try_cast(v:segments AS ARRAY<VARIANT>), s -> s:text::string), ' '),
-             v::string
+             array_join(transform(try_cast(v:response:segments AS ARRAY<VARIANT>), s -> s:text::string), ' '),
+             v:response:text::string,
+             v:text::string
            ) AS transcript_text
     FROM t
 """).display()
@@ -81,9 +81,11 @@ spark.sql(f"""
 
 spark.sql(f"""
     WITH t AS (
-      SELECT COALESCE(
-               parse_json(to_json(ai_transcribe(content))):text::string,
-               parse_json(to_json(ai_transcribe(content))):transcription::string
+      SELECT array_join(
+               transform(
+                 try_cast(parse_json(to_json(ai_transcribe(content))):response:segments AS ARRAY<VARIANT>),
+                 s -> s:text::string
+               ), ' '
              ) AS transcript_text
       FROM read_files('{ONE_FILE}', format => 'binaryFile')
     )
@@ -93,7 +95,7 @@ spark.sql(f"""
       ai_classify(transcript_text,
         ARRAY('new_booking_enquiry','booking_change','cancellation','refund_request',
               'payment_issue','delay_or_disruption','loyalty_points','complaint',
-              'compliment','other')):response[0]::string AS call_reason,
+              'compliment','other')) AS call_reason,
       ai_summarize(transcript_text, 25) AS summary
     FROM t
 """).display()

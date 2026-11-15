@@ -16,11 +16,11 @@ AS SELECT
      path,
      _ingested_at,
      transcription,
+     -- ai_transcribe returns {response:{segments:[{speaker_id,start,end,text}]}} — join the segment texts.
      COALESCE(
-       transcription:text::string,
-       transcription:transcription::string,
-       array_join(transform(try_cast(transcription:segments AS ARRAY<VARIANT>), s -> s:text::string), ' '),
-       transcription::string
+       array_join(transform(try_cast(transcription:response:segments AS ARRAY<VARIANT>), s -> s:text::string), ' '),
+       transcription:response:text::string,
+       transcription:text::string
      ) AS transcript_text
 FROM (
   SELECT
