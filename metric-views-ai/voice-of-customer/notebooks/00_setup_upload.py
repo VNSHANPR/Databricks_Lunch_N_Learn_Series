@@ -13,13 +13,14 @@
 
 # COMMAND ----------
 
-dbutils.widgets.text("catalog", "workspace", "Catalog")
-dbutils.widgets.text("schema", "htg_voc_lab", "Schema")
-dbutils.widgets.text("volume", "call_recordings", "Volume")
-
-CATALOG = dbutils.widgets.get("catalog").strip()
-SCHEMA  = dbutils.widgets.get("schema").strip()
-VOLUME  = dbutils.widgets.get("volume").strip()
+# ===================== CONFIG — edit these for your workspace =====================
+# CATALOG must be a Unity Catalog you can CREATE in:
+#   Free Edition      -> "workspace"
+#   Shared workspace  -> e.g. "de_cert_classic_catalog"   (run `databricks catalogs list`)
+CATALOG = "workspace"
+SCHEMA  = "htg_voc_lab"
+VOLUME  = "call_recordings"
+# ==================================================================================
 FQ = f"{CATALOG}.{SCHEMA}"
 
 spark.sql(f"CREATE SCHEMA IF NOT EXISTS {FQ}")

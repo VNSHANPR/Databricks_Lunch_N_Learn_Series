@@ -93,8 +93,8 @@ databricks bundle run bookings_sdp --profile "$PROFILE" \
 ## Part 2 — Voice-of-Customer pipeline
 
 ### 1. Land the recordings + metadata (once)
-In the workspace, run **`voice-of-customer/notebooks/00_setup_upload`** with its **`catalog`
-widget set to `$CATALOG`** (creates the `call_recordings` Volume, copies the 6 WAVs to
+In the workspace, run **`voice-of-customer/notebooks/00_setup_upload`** — first set **`CATALOG`
+in its CONFIG cell** (cell 1) to `$CATALOG` (creates the `call_recordings` Volume, copies the 6 WAVs to
 `landing/`, builds `conversations`). Then run **`01_try_ai_transcribe`** to confirm
 `ai_transcribe` is enabled (Beta) and see the transcript shape.
 > If `ai_transcribe` is unavailable, use `voice-of-customer/data/ground_truth.csv` as the
@@ -137,7 +137,7 @@ export CATALOG=de_cert_classic_catalog
 - [ ] `databricks current-user me --profile "$PROFILE"` returns your user; `$CATALOG` is in `catalogs list`.
 - [ ] Notebook `00_setup` (sections 1–3) ran with the `catalog` widget = `$CATALOG`; `landing/` has JSON.
 - [ ] `bundle validate` passes for `bookings_sdp`; `bundle run` completes; graph is green.
-- [ ] `00_setup_upload` ran (catalog widget = `$CATALOG`); 6 WAVs in `landing/`; `conversations` has 6 rows.
+- [ ] `00_setup_upload` ran (`CATALOG` set in its CONFIG cell = `$CATALOG`); 6 WAVs in `landing/`; `conversations` has 6 rows.
 - [ ] `01_try_ai_transcribe` prints a transcript (or switch to the ground-truth fallback).
 - [ ] `bundle validate` passes for `voc_sdp`; `bundle run` completes; `call_insights` has 6 rows.
 
@@ -150,4 +150,4 @@ export CATALOG=de_cert_classic_catalog
 | `ai_transcribe` not found / errors | Beta + region-gated — use the `ground_truth.csv` fallback (notebook 01 explains). |
 | Notebook 00 can't find the WAVs | Clone the repo as a **Git folder** in the workspace (step 0e), not just locally. |
 | Pipeline stuck INITIALIZING | Normal cold start for serverless — wait a few minutes. |
-| Table/volume not found at `run` | Run the setup notebook first with its `catalog` widget set to `$CATALOG`. |
+| Table/volume not found at `run` | Run the setup notebook first with the right catalog (`00_setup` widget / `00_setup_upload` CONFIG cell = `$CATALOG`). |

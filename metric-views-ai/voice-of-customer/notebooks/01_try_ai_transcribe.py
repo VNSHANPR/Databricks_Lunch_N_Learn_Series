@@ -12,12 +12,14 @@
 
 # COMMAND ----------
 
-dbutils.widgets.text("catalog", "workspace", "Catalog")
-dbutils.widgets.text("schema", "htg_voc_lab", "Schema")
-dbutils.widgets.text("volume", "call_recordings", "Volume")
-CATALOG = dbutils.widgets.get("catalog").strip()
-SCHEMA  = dbutils.widgets.get("schema").strip()
-VOLUME  = dbutils.widgets.get("volume").strip()
+# ===================== CONFIG — edit these for your workspace =====================
+# Match what you used in 00_setup_upload.
+#   Free Edition      -> "workspace"
+#   Shared workspace  -> e.g. "de_cert_classic_catalog"
+CATALOG = "workspace"
+SCHEMA  = "htg_voc_lab"
+VOLUME  = "call_recordings"
+# ==================================================================================
 LANDING = f"/Volumes/{CATALOG}/{SCHEMA}/{VOLUME}/landing"
 ONE_FILE = f"{LANDING}/call_0003.wav"   # the "delayed flight" complaint
 print("Transcribing:", ONE_FILE)
