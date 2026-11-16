@@ -40,6 +40,16 @@ flowchart LR
             F1 --> F2 --> F3
         end
 
+        subgraph VOX["Voice of Customer - contact-centre call recordings"]
+            direction TB
+            V1["Call recordings as WAV files<br/>Brickstage recorder →<br/>/Volumes/.../call_recordings/landing/"]
+            VA["Auto Loader (binaryFile)<br/>incremental audio ingestion → streaming"]
+            VB["Bronze: loaded_audio_files<br/>streaming table, raw bytes + path"]
+            VS["Silver: call_transcripts<br/>ai_transcribe → response.segments[].text"]
+            VG["Gold: call_insights<br/>ai_analyze_sentiment + ai_classify (call reason)<br/>+ ai_summarize, joined to conversations"]
+            V1 --> VA --> VB --> VS --> VG
+        end
+
         subgraph MV["Metric Views - governed semantic layer"]
             direction TB
             M1["mv_bookings<br/>TTV, commission, cancellation rate,<br/>agentic synonyms"]
@@ -61,14 +71,15 @@ flowchart LR
         MED -->|"comments"| AI
         MED -->|"gold tables"| MV
         AI -->|"enriched"| MV
+        VG ==>|"call insights"| CON
         MV ==>|"query"| CON
     end
 
     classDef plain fill:#F5F7FA,stroke:#8A94A6,color:#1B1F29
     classDef accent fill:#FF3621,stroke:#B3200F,color:#FFFFFF,font-weight:bold
     classDef note fill:#FFF4F2,stroke:#FF3621,color:#1B1F29,stroke-dasharray:4 3
-    class S1,S2,S3,S4,S5,L1,B,SV,F1,F2,M1,M2,M3,C2,C3 plain
-    class A1,G,F3,C1 accent
+    class S1,S2,S3,S4,S5,L1,B,SV,F1,F2,M1,M2,M3,C2,C3,V1,VB,VS plain
+    class A1,G,F3,C1,VA,VG accent
     class L2,MN,LDP note
     style UC fill:#FFFAF9,stroke:#FF3621,stroke-width:2px,color:#1B1F29
     style SRC fill:#FFFFFF,stroke:#C5CBD6,color:#1B1F29
@@ -76,5 +87,6 @@ flowchart LR
     style ING fill:#FFFFFF,stroke:#C5CBD6,color:#1B1F29
     style MED fill:#FFFFFF,stroke:#C5CBD6,color:#1B1F29
     style AI fill:#FFFFFF,stroke:#C5CBD6,color:#1B1F29
+    style VOX fill:#FFFFFF,stroke:#C5CBD6,color:#1B1F29
     style MV fill:#FFFFFF,stroke:#C5CBD6,color:#1B1F29
     style CON fill:#FFFFFF,stroke:#C5CBD6,color:#1B1F29
