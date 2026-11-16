@@ -28,10 +28,14 @@
 
     <div class="sidebar-section-title">Sessions</div>
     <ul class="session-list">
-      <li class="session-item active" data-session="session-20261015">
+      <li class="session-item active" data-session="session-20261116">
+        <span class="session-date">16 Nov 2026</span>
+        <span class="session-title">Metric Views Encore + Voice of Customer</span>
+        <span class="session-badge new">Latest</span>
+      </li>
+      <li class="session-item" data-session="session-20261015">
         <span class="session-date">15 Oct 2026</span>
         <span class="session-title">Metric Views &amp; AI-Built Semantics</span>
-        <span class="session-badge new">Latest</span>
       </li>
       <li class="session-item" data-session="session-20260917">
         <span class="session-date">17 Sep 2026</span>
@@ -1087,7 +1091,212 @@ AsyncDatabricksStore(
     <!-- ══════════════════════════════════════════════════════════════ -->
     <!-- ── SESSION: 15 Oct 2026 — Metric Views & AI-Built Semantics ── -->
     <!-- ══════════════════════════════════════════════════════════════ -->
-    <section id="session-20261015" class="session-page active">
+    <!-- ═══════════════════  SESSION 3 — 16 Nov 2026  ═══════════════════ -->
+    <section id="session-20261116" class="session-page active">
+
+      <div class="hero hero-grid">
+        <div>
+          <div class="hero-badge">Session 3 — 16 November 2026</div>
+          <h1>Metric Views, Encore<br>+ Voice of Customer<br>with <code>ai_transcribe</code></h1>
+          <p class="hero-sub">A rerun of the Metric Views lab — governed semantics over your silver &amp; gold, built fast with Genie / AI — <strong>plus a new module</strong>: turn contact-centre call recordings into governed insight with Auto Loader, <code>ai_transcribe</code> and <code>ai_classify</code>.</p>
+        </div>
+        <div class="terminal-card code-terminal">
+          <div class="terminal-header">
+            <span class="terminal-dot red"></span>
+            <span class="terminal-dot amber"></span>
+            <span class="terminal-dot green"></span>
+            <span class="terminal-title">call_insights.sql</span>
+          </div>
+          <div class="terminal-body code-body">
+<pre class="code-block"><span class="comment">-- audio in a Volume → transcript → insight</span>
+<span class="kw">SELECT</span>
+  ai_transcribe(content)       <span class="comment">-- WAV bytes → text</span>
+  ai_analyze_sentiment(t)      <span class="comment">-- +/-/neutral/mixed</span>
+  ai_classify(t, labels)       <span class="comment">-- call reason</span>
+  ai_summarize(t, 25)          <span class="comment">-- one-line wrap-up</span>
+<span class="kw">FROM</span> read_files('/Volumes/.../landing',
+                 format =&gt; 'binaryFile')</pre>
+          </div>
+        </div>
+      </div>
+
+      <div class="content-card tabs-card">
+        <div class="agenda-tabs" role="tablist" aria-label="Agenda tabs">
+          <button class="agenda-tab active" data-tab="s3-tab-overview" role="tab" aria-selected="true">Overview</button>
+          <button class="agenda-tab" data-tab="s3-tab-arch" role="tab" aria-selected="false">Architecture</button>
+          <button class="agenda-tab" data-tab="s3-tab-voc" role="tab" aria-selected="false">Voice of Customer</button>
+          <button class="agenda-tab" data-tab="s3-tab-deploy" role="tab" aria-selected="false">Deploy &amp; run</button>
+        </div>
+
+        <!-- ═══════════════  OVERVIEW  ═══════════════ -->
+        <section id="s3-tab-overview" class="tab-panel active" role="tabpanel">
+          <div class="card-header compact">
+            <span class="agenda-num">01</span>
+            <div>
+              <h2>A repeat — with one new thing</h2>
+              <p class="card-sub">The same Metric Views hands-on lab as last session, re-run for this audience. The new addition is a <strong>Voice-of-Customer</strong> module built on call recordings.</p>
+            </div>
+          </div>
+
+          <div class="confidential-note">
+            <strong>What's the same:</strong> the full Metric Views flow (Auto Loader → medallion → governed UC Metric Views → Genie), exactly as in <em>Session 2 — Metric Views &amp; AI-Built Semantics</em>. Open that session from the sidebar for the complete walkthrough.
+          </div>
+
+          <div class="two-col" style="margin-top:1.25rem;">
+            <div class="info-block">
+              <h3>Recap (Session 2)</h3>
+              <ul class="checklist">
+                <li>Auto Loader → Bronze → Silver → Gold star schema</li>
+                <li>Governed UC <strong>Metric Views</strong> with agentic metadata</li>
+                <li>Discover candidates from system tables; convert Power BI</li>
+                <li>Genie &amp; dashboards over one governed definition</li>
+              </ul>
+            </div>
+            <div class="info-block highlight">
+              <h3>New this session — Voice of Customer</h3>
+              <ul class="checklist">
+                <li>Call recordings (WAV) land in a UC Volume — like the Brickstage recorder</li>
+                <li><strong>Auto Loader</strong> ingests the audio incrementally (binaryFile)</li>
+                <li><code>ai_transcribe</code> → transcript; <code>ai_classify</code> → call reason</li>
+                <li><code>ai_analyze_sentiment</code> + <code>ai_summarize</code>, served to Genie / AI-BI</li>
+                <li>Packaged as a production <strong>Spark Declarative Pipeline</strong> + DABs</li>
+              </ul>
+            </div>
+          </div>
+
+          <p class="card-sub" style="margin-top:1rem;">The bookings medallion is now also packaged as a deployable 3-stage SDP (ingestion → silver → prod) with data-quality expectations — see <strong>Deploy &amp; run</strong>.</p>
+        </section>
+
+        <!-- ═══════════════  ARCHITECTURE  ═══════════════ -->
+        <section id="s3-tab-arch" class="tab-panel" role="tabpanel">
+          <div class="card-header compact">
+            <span class="agenda-num">02</span>
+            <div>
+              <h2>Two pipelines, one platform</h2>
+              <p class="card-sub">The bookings medallion from Session 2, plus the new call-transcript flow — both are Auto Loader → medallion → AI → governed consumption.</p>
+            </div>
+          </div>
+
+          <div class="arch-block">
+            <h3>1 · Bookings → Metric Views (recap)</h3>
+            <div class="arch-figure" style="overflow-x:auto;">
+              <img src="metric-views-ai/assets/architecture.svg" loading="lazy" alt="HTG bookings architecture: retail channels emit JSON into a UC Volume; Auto Loader ingests to a Bronze streaming table, cleaned to Silver and modelled into a Gold star schema; ai_classify enriches customer comments; governed UC Metric Views are consumed by Genie, dashboards and SQL." style="min-width:1100px; width:2352px; max-width:none;">
+            </div>
+            <figcaption class="card-sub" style="margin-top:.6rem;"><a href="metric-views-ai/assets/architecture.svg" target="_blank" rel="noopener" class="btn-link">Open full size →</a></figcaption>
+          </div>
+
+          <div class="arch-block" style="margin-top:1.5rem;">
+            <h3>2 · Call recordings → insight (new)</h3>
+            <p class="card-sub" style="margin-bottom:1rem;">Modelled on the Genesys "batch, post-call speech analytics" flow — but using the built-in <code>ai_transcribe</code> (no GPU Whisper endpoint), so it runs on Free Edition serverless.</p>
+            <div class="arch-diagram">
+              <div class="arch-row"><div class="arch-box ext">Call recordings · WAV in UC Volume <span class="arch-sub">Brickstage recorder → landing/</span></div></div>
+              <div class="arch-arrow">↓ &nbsp;<span style="color:var(--text-secondary);font-size:.85rem;">Auto Loader · read_files(binaryFile)</span></div>
+              <div class="arch-row"><div class="arch-box backend">Bronze · loaded_audio_files <span class="arch-sub">one row per recording — bytes + path</span></div></div>
+              <div class="arch-arrow">↓ &nbsp;<span style="color:var(--text-secondary);font-size:.85rem;">ai_transcribe(content) — once per call</span></div>
+              <div class="arch-row"><div class="arch-box backend">Silver · call_transcripts <span class="arch-sub">response.segments[].text → transcript_text</span></div></div>
+              <div class="arch-arrow">↓ &nbsp;<span style="color:var(--text-secondary);font-size:.85rem;">ai_analyze_sentiment · ai_classify · ai_summarize</span></div>
+              <div class="arch-row"><div class="arch-box backend">Gold · call_insights <span class="arch-sub">+ join conversations metadata</span></div></div>
+              <div class="arch-arrow">↓</div>
+              <div class="arch-row multi">
+                <div class="arch-box ext">Genie<br><span class="arch-sub">ask in plain English</span></div>
+                <div class="arch-box ext">AI/BI dashboard<br><span class="arch-sub">sentiment · top reasons</span></div>
+                <div class="arch-box ext">Metric Views<br><span class="arch-sub">governed call KPIs</span></div>
+              </div>
+            </div>
+            <figcaption class="card-sub" style="margin-top:.6rem;">All serverless, governed by Unity Catalog. <code>ai_transcribe</code> is Beta — the lab checks availability and falls back to shipped ground-truth transcripts if needed.</figcaption>
+          </div>
+        </section>
+
+        <!-- ═══════════════  VOICE OF CUSTOMER  ═══════════════ -->
+        <section id="s3-tab-voc" class="tab-panel" role="tabpanel">
+          <div class="card-header compact">
+            <span class="agenda-num">03</span>
+            <div>
+              <h2>Voice of Customer — audio → governed insight</h2>
+              <p class="card-sub">Six simulated Flight Centre calls, transcribed, classified and summarised with AI Functions.</p>
+            </div>
+          </div>
+
+          <div class="two-col">
+            <div class="info-block">
+              <h3>The AI functions</h3>
+              <ul class="checklist">
+                <li><code>ai_transcribe(content)</code> — audio bytes → diarised, timestamped segments</li>
+                <li><code>ai_analyze_sentiment</code> — positive / negative / neutral / mixed</li>
+                <li><code>ai_classify(text, labels)</code> — the call reason (returns the label string)</li>
+                <li><code>ai_summarize(text, 25)</code> — a one-line wrap-up</li>
+              </ul>
+            </div>
+            <div class="info-block highlight">
+              <h3>Call-reason labels</h3>
+              <p>new_booking_enquiry · booking_change · cancellation · refund_request · payment_issue · delay_or_disruption · loyalty_points · complaint · compliment · other</p>
+            </div>
+          </div>
+
+          <div class="arch-block" style="margin-top:1.25rem;">
+            <h3>Example — a disruption call</h3>
+<pre class="code-block"><span class="comment">transcript</span> : "This is an absolute mess. My connecting flight in Singapore
+             was cancelled and I'm stuck at the airport..."
+<span class="kw">sentiment</span>   : mixed
+<span class="kw">call_reason</span> : delay_or_disruption
+<span class="kw">summary</span>     : "Customer stranded by a cancelled Singapore connection;
+             agent rebooks within 90 minutes and arranges lounge access."</pre>
+          </div>
+
+          <div class="confidential-note" style="margin-top:1rem;">
+            <strong>The pattern that matters:</strong> run the expensive AI call <em>once</em> per recording in a streaming table and persist it — never re-invoke on every query. At scale, classify the cardinality that matters, not every row.
+          </div>
+        </section>
+
+        <!-- ═══════════════  DEPLOY  ═══════════════ -->
+        <section id="s3-tab-deploy" class="tab-panel" role="tabpanel">
+          <div class="card-header compact">
+            <span class="agenda-num">04</span>
+            <div>
+              <h2>Deploy &amp; run it yourself</h2>
+              <p class="card-sub">Clone the repo into your workspace, run the setup notebook, then either step through the notebooks or deploy the pipelines with Asset Bundles.</p>
+            </div>
+          </div>
+
+          <div class="two-col">
+            <div class="info-block">
+              <h3>Notebook path</h3>
+              <ul class="checklist">
+                <li>Clone this repo as a <strong>Git folder</strong> in your workspace</li>
+                <li>Run <code>voice-of-customer/notebooks/00_setup_upload</code> (lands the WAVs, builds <code>conversations</code>)</li>
+                <li>Run <code>01_try_ai_transcribe</code> — one call transcribed + enriched</li>
+                <li>For bookings: <code>notebooks/00</code>–<code>05</code>, then <code>04_build_metric_views</code></li>
+              </ul>
+            </div>
+            <div class="info-block">
+              <h3>Pipeline path (DABs)</h3>
+<pre class="code-block"><span class="comment"># set your workspace + catalog once</span>
+export PROFILE=&lt;your-profile&gt;
+export CATALOG=&lt;your-catalog&gt;
+
+databricks bundle deploy --profile "$PROFILE" \
+  --var="catalog=$CATALOG"
+databricks bundle run voc_sdp --profile "$PROFILE" \
+  --var="catalog=$CATALOG"</pre>
+            </div>
+          </div>
+
+          <div class="confidential-note" style="margin-top:1rem;">
+            <strong>Live demo — Git branches:</strong> today's material lives on the <code>voc-and-prod-sdp-pipelines</code> branch. We'll switch the workspace Git folder between <code>main</code> and this branch live, to show how the same lab evolves under version control.
+          </div>
+
+          <div style="margin-top:1rem; display:flex; gap:.75rem; flex-wrap:wrap;">
+            <a class="btn-link" href="https://github.com/VNSHANPR/Databricks_Lunch_N_Learn_Series/blob/voc-and-prod-sdp-pipelines/metric-views-ai/DEPLOY.md" target="_blank" rel="noopener">Full deploy guide (DEPLOY.md) →</a>
+            <a class="btn-link" href="https://github.com/VNSHANPR/Databricks_Lunch_N_Learn_Series/tree/voc-and-prod-sdp-pipelines/metric-views-ai/voice-of-customer" target="_blank" rel="noopener">voice-of-customer/ →</a>
+            <a class="btn-link" href="https://github.com/VNSHANPR/Databricks_Lunch_N_Learn_Series/tree/voc-and-prod-sdp-pipelines/metric-views-ai/pipelines/bookings_sdp" target="_blank" rel="noopener">bookings_sdp pipeline →</a>
+          </div>
+        </section>
+
+      </div>
+    </section>
+
+    <!-- ═══════════════════  SESSION 2 — 15 Oct 2026  ═══════════════════ -->
+    <section id="session-20261015" class="session-page">
 
       <div class="hero hero-grid">
         <div>

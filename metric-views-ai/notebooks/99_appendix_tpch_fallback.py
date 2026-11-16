@@ -38,16 +38,25 @@ _cfg = _read_lab_cfg()
 if _cfg:
     CATALOG, SCHEMA = _cfg["htg.catalog"], _cfg["htg.schema"]
 else:
+    # Standalone run (no 00 config): use the current catalog + lab schema. Don't assume a
+    # catalog named "workspace" exists — if we can't resolve one, say so clearly.
     try:
         CATALOG = spark.sql("SELECT current_catalog()").first()[0]
     except Exception:
-        CATALOG = "workspace"
+        CATALOG = None
+    assert CATALOG, ("Could not determine a catalog to use. Run 00_setup first, or `USE CATALOG "
+                     "<a catalog you can CREATE SCHEMA in>` before running this appendix.")
     SCHEMA = LAB_SCHEMA
 FQ = f"{CATALOG}.{SCHEMA}"
-spark.sql(f"CREATE SCHEMA IF NOT EXISTS {FQ}")
-spark.sql(f"USE CATALOG {CATALOG}")
-spark.sql(f"USE SCHEMA {SCHEMA}")
-print(f"Using {FQ}")
+try:
+    spark.sql(f"CREATE SCHEMA IF NOT EXISTS {FQ}")
+    spark.sql(f"USE CATALOG {CATALOG}")
+    spark.sql(f"USE SCHEMA {SCHEMA}")
+    print(f"Using {FQ}")
+except Exception as e:
+    raise RuntimeError(
+        f"Couldn't prepare {FQ} — check you can CREATE SCHEMA in catalog '{CATALOG}'. "
+        f"Run 00_setup first, or set a catalog you have rights to. Detail: {str(e)[:200]}")
 
 # COMMAND ----------
 

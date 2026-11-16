@@ -1,0 +1,36 @@
+# Databricks Asset Bundle — Voice-of-Customer pipeline
+# Call recordings (WAV) in a Volume → Auto Loader → ai_transcribe → ai_classify/sentiment/summarize.
+# Mirrors the Genesys "batch, post-call speech analytics" flow, but uses the built-in
+# ai_transcribe function (no GPU Whisper endpoint) so it runs on Free Edition serverless.
+#
+#   databricks bundle validate --profile <PROFILE>
+#   databricks bundle deploy   --profile <PROFILE>
+#   databricks bundle run voc_sdp --profile <PROFILE>
+#
+# Prereq: run notebooks/00_setup_upload first (creates the Volume, lands the WAVs, builds `conversations`).
+bundle:
+  name: htg_voice_of_customer
+
+variables:
+  catalog:
+    description: "Unity Catalog to publish into (Free Edition: usually `workspace`)."
+    default: workspace
+  target_schema:
+    description: Schema for the pipeline tables. Keep it the same as notebook 00 so `conversations` resolves.
+    default: htg_voc_lab
+  recordings_path:
+    description: Volume landing folder Auto Loader watches for new call WAVs.
+    default: /Volumes/workspace/htg_voc_lab/call_recordings/landing
+  metadata_table:
+    description: The call-metadata table built by notebook 00 (fully qualified).
+    default: workspace.htg_voc_lab.conversations
+
+include:
+  - resources/*.yml
+
+targets:
+  dev:
+    mode: development
+    default: true
+  prod:
+    mode: production

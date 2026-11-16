@@ -52,16 +52,18 @@ function initMobileMenu() {
 
 function initAgendaTabs() {
   const tabs = document.querySelectorAll('.agenda-tab');
-  const panels = document.querySelectorAll('.tab-panel');
 
   tabs.forEach(tab => {
     tab.addEventListener('click', () => {
       const targetId = tab.dataset.tab;
-      tabs.forEach(t => {
+      // Scope the reset to THIS session page so each session keeps its own active tab
+      // when you switch between sessions in the sidebar.
+      const scope = tab.closest('.session-page') || document;
+      scope.querySelectorAll('.agenda-tab').forEach(t => {
         t.classList.remove('active');
         t.setAttribute('aria-selected', 'false');
       });
-      panels.forEach(panel => panel.classList.remove('active'));
+      scope.querySelectorAll('.tab-panel').forEach(panel => panel.classList.remove('active'));
 
       tab.classList.add('active');
       tab.setAttribute('aria-selected', 'true');

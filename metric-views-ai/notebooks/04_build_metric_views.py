@@ -11,13 +11,17 @@
 
 # COMMAND ----------
 
-# Catalog & schema are chosen ONCE in notebook 00 (its widgets) and recorded in a small
-# JSON config on the lab Volume. Downstream notebooks READ that config — they define no
-# catalog/schema of their own, so there's nothing to keep in sync. We locate the config by
-# scanning the catalogs you can see for the lab schema's config file.
+# ===================== CONFIG — point these at the Gold you want =====================
+# Leave BOTH blank to auto-detect the catalog/schema you chose in 00_setup (the BATCH Gold).
+# To build the metric view over a DIFFERENT Gold — e.g. the SDP pipeline's prod schema —
+# set them explicitly, e.g.:
+#   CATALOG = "de_cert_classic_catalog"   ;   SCHEMA = "htg_metric_views_lab_prod"
+CATALOG = ""
+SCHEMA  = ""
+# ====================================================================================
 import json
 
-LAB_SCHEMA = "htg_metric_views_lab"   # lab's fixed schema name — used only to locate 00's config
+LAB_SCHEMA = "htg_metric_views_lab"   # fixed schema name — only used to locate 00's auto-config
 
 def _read_lab_cfg():
     cats = []
@@ -37,14 +41,17 @@ def _read_lab_cfg():
             continue
     return None
 
-_cfg = _read_lab_cfg()
-assert _cfg, ("Lab config not found — run 00_setup first. It picks the catalog/schema and "
-              "writes _htg_config.json on the lab Volume, which every downstream notebook reads.")
-CATALOG, SCHEMA = _cfg["htg.catalog"], _cfg["htg.schema"]
+if not (CATALOG and SCHEMA):
+    _cfg = _read_lab_cfg()
+    assert _cfg, ("Set CATALOG and SCHEMA in the CONFIG cell above, or run 00_setup first "
+                  "(it writes _htg_config.json on the lab Volume for auto-detect).")
+    CATALOG = CATALOG or _cfg["htg.catalog"]
+    SCHEMA  = SCHEMA  or _cfg["htg.schema"]
+
 FQ = f"{CATALOG}.{SCHEMA}"
 spark.sql(f"USE CATALOG {CATALOG}")
 spark.sql(f"USE SCHEMA {SCHEMA}")
-print(f"Using {FQ} (from 00_setup config)")
+print(f"Using {FQ}")
 
 # COMMAND ----------
 

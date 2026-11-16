@@ -39,6 +39,12 @@
 # MAGIC On a fresh trial your default catalog is often `workspace` (or `main`). Pick any
 # MAGIC catalog you can **CREATE SCHEMA** in. Everything the lab creates lands in one schema
 # MAGIC so it's easy to clean up afterwards.
+# MAGIC
+# MAGIC > ⚠️ **Leave the `schema` at its default (`htg_metric_views_lab`).** The downstream
+# MAGIC > notebooks (`01`–`05`, `99`) locate this notebook's config by that schema name. If you
+# MAGIC > really must rename it, also update the `LAB_SCHEMA` constant at the top of each of
+# MAGIC > those notebooks to match — otherwise they won't find the config. The **catalog** is
+# MAGIC > the knob to change; it's auto-discovered downstream.
 
 # COMMAND ----------
 
